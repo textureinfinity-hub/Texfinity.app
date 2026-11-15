@@ -2,17 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-WKwctBwXKCAq4XoxuJ5mMRYSvf+TUYzYvy33Jpz6bhA='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self' https://api.texfinity.app; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-L1Uaq+za8YRk8w3n3PTqQG4jAe55Ir6sd9jForoQB/4='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self' https://api.texfinity.app; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Texfinity: the Minecraft texture pack maker</title>
-<meta name="description" content="Make Minecraft Java texture packs in one free Windows app: paint editor, paint effects, 3D models, skyboxes, sounds and more.">
+<meta name="description" content="The all-in-one Minecraft texture pack maker. Paint, add 130 animated effects, model in 3D, make skyboxes and sounds. Coming soon to Windows.">
 <meta name="theme-color" content="#08080a">
 <meta name="color-scheme" content="dark">
-<link rel="icon" type="image/png" href="texfinity-cube-64.png">
+<!-- Google shows icons that are a multiple of 48px, so search results get these. -->
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" sizes="192x192" href="texfinity-icon-192.png">
 <link rel="apple-touch-icon" href="texfinity-cube-128.png">
 <link rel="canonical" href="https://texfinity.app/">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://texfinity.app/#site","name":"Texfinity","alternateName":["texfinity.app","Texfinity texture pack maker"],"url":"https://texfinity.app/","publisher":{"@id":"https://texfinity.app/#org"}},{"@type":"Organization","@id":"https://texfinity.app/#org","name":"Texfinity","url":"https://texfinity.app/","logo":{"@type":"ImageObject","url":"https://texfinity.app/texfinity-logo-512.png","width":512,"height":512},"sameAs":["https://discord.gg/texfinity","https://ko-fi.com/texfinity"]},{"@type":"SoftwareApplication","name":"Texfinity","url":"https://texfinity.app/","description":"Make Minecraft Java texture packs in one free Windows app: paint editor, paint effects, 3D models, skyboxes, sounds and more.","applicationCategory":"DesignApplication","operatingSystem":"Windows 10, Windows 11","image":"https://texfinity.app/og-card.png","publisher":{"@id":"https://texfinity.app/#org"}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://texfinity.app/#site","name":"Texfinity","alternateName":["texfinity.app","Texfinity texture pack maker"],"url":"https://texfinity.app/","publisher":{"@id":"https://texfinity.app/#org"}},{"@type":"Organization","@id":"https://texfinity.app/#org","name":"Texfinity","url":"https://texfinity.app/","logo":{"@type":"ImageObject","url":"https://texfinity.app/texfinity-logo-512.png","width":512,"height":512},"sameAs":["https://discord.gg/texfinity","https://ko-fi.com/texfinity"]},{"@type":"SoftwareApplication","name":"Texfinity","url":"https://texfinity.app/","description":"The all-in-one Minecraft texture pack maker. Paint, add 130 animated effects, model in 3D, make skyboxes and sounds. Coming soon to Windows.","applicationCategory":"DesignApplication","operatingSystem":"Windows 10, Windows 11","image":"https://texfinity.app/og-card.png","publisher":{"@id":"https://texfinity.app/#org"}}]}</script>
 <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
 <!-- The card shown when someone posts the link (Discord, X, WhatsApp...). og-card.png is made from og-card.html. -->
 <meta property="og:type" content="website">
@@ -741,7 +743,7 @@ a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-s
       <section class="answers" id="answers" aria-labelledby="ansTitle">
         <h2 id="ansTitle" class="reveal">Search for an answer</h2>
         <div class="search reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="faqQ" type="search" placeholder="Try: windows warning, optifine, where are my packs" autocomplete="off" aria-label="Search the answers"></div>
-        <div class="faq reveal" id="faq"></div>
+        <div class="faq reveal" id="faq" data-nosnippet></div>
         <div class="faq-count" id="faqCount"></div>
       </section>
 
@@ -762,7 +764,7 @@ a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-s
   </section>
 
   <!-- PRIVACY -->
-  <section class="page" id="page-privacy" data-page="privacy">
+  <section class="page" id="page-privacy" data-page="privacy" data-nosnippet>
     <div class="wrap page-pad legal">
       <h1 class="section-title reveal">Privacy policy</h1>
       <p class="lede reveal">Last updated 15 November 2026. What Texfinity collects, why, and what you can ask us to do with it. In short: very little, nothing is sold, and your packs never leave your PC.</p>
@@ -819,7 +821,7 @@ a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-s
   </section>
 
   <!-- TERMS -->
-  <section class="page" id="page-terms" data-page="terms">
+  <section class="page" id="page-terms" data-page="terms" data-nosnippet>
     <div class="wrap page-pad legal">
       <h1 class="section-title reveal">Terms of use</h1>
       <p class="lede reveal">Last updated 15 November 2026. The rules for using Texfinity and buying Pro.</p>
@@ -1545,7 +1547,7 @@ const FAQ = [
   ['Is Texfinity free?', 'The paint editor is free, and so is making and exporting packs. Pro, one payment, unlocks everything else: paint effects, block details, totem pop colours, the sound editor, the 3D model editor, the skybox generator, plugins, Upscale, Showcase, Bedrock import and export, and linked folders.'],
   ['Which Minecraft versions does it make packs for?', 'Minecraft Java Edition, from 1.6 up to the latest releases. You pick the version when you make a pack, and you can change it later.'],
   ['Why does Windows warn me when I open it?', 'Texfinity is new and not signed with a paid certificate yet, so SmartScreen may stop it the first time. Click "More info", then "Run anyway". The Download page shows the two screens.'],
-  ['How do I know my download is the real Texfinity?', 'Only download it from texfinity.app or our Discord. The Download page shows the SHA-256 checksum of the current version: in PowerShell, run Get-FileHash on the file and check it matches exactly. If it does not, delete it and tell us.'],
+  ['How do I know my download is the real Texfinity?', 'Only download it from texfinity.app or our Discord. When Texfinity is out, the Download page shows the SHA-256 checksum of the current version: in PowerShell, run Get-FileHash on the file and check it matches exactly. If it does not, delete it and tell us.'],
   ['Does it work on Mac or Linux?', 'Not yet. Texfinity is Windows only for now. Ask for it on Discord to hear first when that changes.'],
   ['Where are my packs saved?', 'In Texfinity’s own folder on your PC. Click Folders on the home screen to open it. Packs you link from another folder stay where they are.'],
   ['How do I get my pack into Minecraft?', 'Click Export. The first time you pick your resourcepacks folder; after that, Export saves the .zip straight there and replaces the old one. Test in game reloads Minecraft’s packs for you (F3+T).'],
