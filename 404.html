@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Page not found · Texfinity</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#08080a">
+<link rel="icon" type="image/png" href="/texfinity-cube-64.png">
+<script>
+  // texfinity.app/privacy, /terms, /shop... are sections of the one-page site: go straight there.
+  (function () {
+    var page = location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+    var known = ['home', 'features', 'download', 'shop', 'cart', 'contact', 'account', 'privacy', 'terms'];
+    if (known.indexOf(page) !== -1) location.replace('/#' + page);
+  })();
+</script>
+<style>
+  @font-face { font-family: "Archivo"; src: url("/fonts/archivo.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: #08080a; color: #f3f3f6; font-family: "Archivo", system-ui, -apple-system, sans-serif; display: grid; place-items: center; padding: 24px; text-align: center; }
+  img { width: 72px; height: 72px; border-radius: 16px; border: 1px solid rgba(255,255,255,.11); }
+  h1 { font-size: clamp(56px, 16vw, 120px); font-weight: 900; letter-spacing: -.03em; margin: 18px 0 4px; line-height: 1; }
+  p { color: #b0b0bb; margin: 0 0 26px; font-size: 16px; }
+  a { display: inline-flex; padding: 12px 22px; border-radius: 999px; background: #ececf1; color: #08080a; font-weight: 700; text-decoration: none; }
+  a:hover { background: #fff; }
+  a:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+</style>
+</head>
+<body>
+  <main>
+    <img src="/texfinity-cube-128.png" alt="">
+    <h1>404</h1>
+    <p>This page doesn't exist. Maybe the snakes ate it.</p>
+    <a href="/">Back to Texfinity</a>
+  </main>
+</body>
+</html>

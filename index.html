@@ -1,0 +1,1516 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-C0dYgM5JGPhI3h6jkXxKub0Kh8laTn6daNoUyimBxxQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self' https://api.texfinity.app; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Texfinity: the Minecraft texture pack maker</title>
+<meta name="description" content="Make Minecraft Java texture packs in one free Windows app: paint editor, paint effects, 3D models, skyboxes, sounds and more.">
+<meta name="theme-color" content="#08080a">
+<meta name="color-scheme" content="dark">
+<link rel="icon" type="image/png" href="texfinity-cube-64.png">
+<link rel="apple-touch-icon" href="texfinity-cube-128.png">
+<link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://texfinity.app/">
+<meta property="og:title" content="Texfinity">
+<meta property="og:description" content="Make Minecraft Java texture packs in one free Windows app: paint editor, paint effects, 3D models, skyboxes, sounds and more.">
+<meta property="og:image" content="https://texfinity.app/feat-fx.jpg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<style>
+/* Fonts served from this site (no visitor data goes to Google). Archivo and Space Mono: SIL Open Font License. */
+@font-face { font-family: "Archivo"; src: url("fonts/archivo.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Space Mono"; src: url("fonts/space-mono-400.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Space Mono"; src: url("fonts/space-mono-700.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+/* Texfinity: the endless Minecraft texture pack maker. Monochrome, kinetic, a morphing 3D shape.
+   One accent: white. Radius: pill buttons, 16px cards, 12px inputs, 10px icon wells. One committed dark theme.
+   Contrast: body copy ~9:1, secondary text ~7:1, small labels ~4.8:1 on every surface. */
+:root {
+  --bg: #08080a; --bg-2: #15151b; --bg-3: #1d1d25; --panel: #111116;
+  --line: rgba(255,255,255,.11); --line-2: rgba(255,255,255,.2);
+  --fg: #f3f3f6; --fg-dim: #b0b0bb; --fg-faint: #85858f; --white: #fff; --btn: #ececf1;
+  --r: 16px; --r-md: 12px; --r-sm: 10px; --pill: 999px;
+  --font: "Archivo", system-ui, -apple-system, sans-serif;
+  --mono: "Space Mono", ui-monospace, monospace;
+  --ease: cubic-bezier(.2,1,.2,1); --ease-in: cubic-bezier(.5,0,.75,0);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.5; letter-spacing: .005em; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: var(--bg); }
+.wrap { max-width: 1200px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.dim { color: var(--fg-dim); } .faint { color: var(--fg-faint); }
+:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; border-radius: var(--r-sm); }
+img { max-width: 100%; }
+
+/* cursor: an inverting blob over a dot grid that leans away from it (mouse only; off for touch and reduced motion) */
+.cur-grid { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+.cur-blob { position: fixed; top: 0; left: 0; width: 100px; height: 100px; margin: -50px 0 0 -50px; /* drawn large and only ever scaled down, so the edge stays sharp */ border-radius: 50%; background: #fff; mix-blend-mode: difference; pointer-events: none; z-index: 95; opacity: 0; transition: opacity .3s; }
+html.blob-on .cur-blob { opacity: 1; }
+html.blob-on, html.blob-on a, html.blob-on button, html.blob-on [role="button"], html.blob-on .fcard, html.blob-on summary, html.blob-on label { cursor: none; }
+html.blob-on input, html.blob-on textarea { cursor: text; }
+@media (hover: none), (pointer: coarse) { .cur-grid, .cur-blob { display: none; } }
+
+/* nav */
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50; height: 64px; display: flex; align-items: center; background: rgba(8,8,10,.72); backdrop-filter: blur(16px) saturate(1.1); border-bottom: 1px solid var(--line); }
+.nav .wrap { display: flex; align-items: center; gap: 20px; width: 100%; }
+.brand { display: flex; align-items: center; gap: 10px; flex: none; }
+.brand img { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--line); display: block; }
+.brand b { font-weight: 800; letter-spacing: .16em; font-size: 14px; }
+.nav-links { position: relative; display: flex; gap: 2px; margin: 0 auto; }
+.nav-pill { position: absolute; top: 0; left: 0; height: 100%; border-radius: var(--pill); background: var(--bg-3); border: 1px solid var(--line-2); transition: transform .42s var(--ease), width .42s var(--ease), opacity .25s; z-index: 0; }
+.nav-link { position: relative; z-index: 1; padding: 8px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: .09em; color: var(--fg-dim); border-radius: var(--pill); transition: color .3s; }
+.nav-link.active, .nav-link:hover { color: var(--fg); }
+.nav-right { display: flex; align-items: center; gap: 10px; flex: none; }
+.cart-btn { position: relative; width: 38px; height: 38px; border: 1px solid var(--line); border-radius: var(--pill); display: grid; place-items: center; transition: border-color .25s, transform .3s var(--ease); }
+.cart-btn:hover { border-color: var(--line-2); transform: translateY(-1px); }
+.cart-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.cart-count { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: var(--pill); background: var(--white); color: var(--bg); font-size: 10.5px; font-weight: 800; display: grid; place-items: center; transform: scale(0); transition: transform .3s var(--ease); }
+.cart-count.show { transform: scale(1); }
+.btn-get { display: inline-flex; align-items: center; gap: 7px; padding: 8px 15px; border-radius: var(--pill); background: var(--btn); color: var(--bg); font-size: 12.5px; font-weight: 700; transition: transform .3s var(--ease), box-shadow .3s; }
+.btn-get:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(255,255,255,.14); }
+.nav-burger { display: none; }
+
+main { min-height: 70vh; }
+.page { display: none; } .page.active { display: block; }
+.page-pad { padding-block: 56px 80px; }
+.reveal { opacity: 1; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+.section-title { font-size: clamp(26px, 4vw, 40px); font-weight: 800; letter-spacing: -.01em; }
+.lede { color: var(--fg-dim); max-width: 60ch; margin-top: 10px; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 22px; border-radius: var(--pill); font-weight: 700; font-size: 13.5px; letter-spacing: .02em; transition: transform .3s var(--ease), background-color .25s, border-color .25s, color .25s, box-shadow .3s; }
+.btn-primary { background: var(--btn); color: var(--bg); }
+.btn-primary:hover { background: var(--white); box-shadow: 0 10px 34px rgba(255,255,255,.14); }
+.btn-ghost { border: 1px solid var(--line-2); color: var(--fg); background: var(--bg-2); }
+.btn-ghost:hover { background: var(--bg-3); border-color: rgba(255,255,255,.3); }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.btn-primary svg { stroke: var(--bg); }
+
+/* hero */
+.hero { position: relative; padding-top: 48px; padding-bottom: 20px; }
+.hero-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 24px; align-items: center; min-height: 460px; }
+.hero-badge { display: inline-flex; align-items: center; gap: 10px; padding: 7px 14px; border: 1px solid var(--line); border-radius: var(--pill); font-size: 11.5px; font-weight: 700; letter-spacing: .14em; }
+.hero-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--white); animation: pulse 2s var(--ease) infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.7); } }
+.hero h1 { font-size: clamp(46px, 9vw, 108px); font-weight: 900; line-height: .9; letter-spacing: -.02em; margin: 18px 0 0; }
+.hero h1 .line { display: block; overflow: hidden; }
+.hero h1 .w { display: inline-block; }
+.hero-sub { color: var(--fg-dim); font-size: 16px; max-width: 42ch; margin: 18px 0 26px; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.hero-cta .meta { font-family: var(--mono); font-size: 11.5px; color: var(--fg-faint); }
+.hero-art { position: relative; height: 460px; display: grid; place-items: center; }
+/* the knot: tilts and pans toward the cursor; click it and the snakes hiss and rattle */
+.hero-art { perspective: 1100px; }
+.hero-art::before { content: ""; position: absolute; width: 90%; aspect-ratio: 2 / 1; border-radius: 50%; background: radial-gradient(ellipse, rgba(255,255,255,.08), rgba(255,255,255,0) 65%); pointer-events: none; }
+.knot-wrap { position: relative; width: 128%; max-width: none; margin-left: -14%; transform-style: preserve-3d; will-change: transform; cursor: pointer; border-radius: 24px; outline-offset: 6px; }
+.knot-wrap video { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.knot-wrap canvas { display: block; width: 100%; height: auto; aspect-ratio: 3 / 1; pointer-events: none; filter: drop-shadow(0 18px 40px rgba(0,0,0,.6)); }
+.knot-wrap .knot-hint { position: absolute; right: 8%; bottom: -6px; font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; color: var(--fg-faint); opacity: 0; transition: opacity .4s; pointer-events: none; }
+.knot-wrap:hover .knot-hint, .knot-wrap:focus-visible .knot-hint { opacity: 1; }
+.knot-wrap.resting { cursor: default; }
+.knot-wrap.resting .knot-hint { opacity: .3 !important; }
+.knot-wrap.shake { animation: knotShake .9s cubic-bezier(.36,.07,.19,.97); }
+@keyframes knotShake { 10%, 90% { translate: -1px 0; } 20%, 80% { translate: 3px 0; } 30%, 50%, 70% { translate: -5px 0; } 40%, 60% { translate: 5px 0; } }
+.hero-meta { position: absolute; left: 0; bottom: 6px; font-family: var(--mono); font-size: 11px; color: var(--fg-faint); letter-spacing: .04em; }
+
+/* feature tiles on home */
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 44px; }
+.tile { display: flex; align-items: center; gap: 12px; padding: 18px; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); transition: border-color .3s, transform .4s var(--ease), background-color .3s; }
+.tile:hover { border-color: var(--line-2); transform: translateY(-3px); background: var(--bg-2); }
+.tile .ti { width: 34px; height: 34px; border-radius: var(--r-sm); display: grid; place-items: center; background: var(--bg-3); }
+.tile .ti svg { width: 18px; height: 18px; fill: none; stroke: var(--fg); stroke-width: 1.6; }
+.tile b { font-size: 14px; font-weight: 700; }
+.tile .arr { margin-left: auto; color: var(--fg-faint); transition: transform .3s var(--ease), color .3s; }
+.tile:hover .arr { transform: translateX(4px); color: var(--fg); }
+
+/* features bento */
+.bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-top: 30px; }
+.fcard { border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); padding: 22px; grid-column: span 2; display: flex; flex-direction: column; gap: 10px; transition: border-color .3s, transform .4s var(--ease), background-color .3s; min-height: 170px; }
+.fcard:hover { border-color: var(--line-2); transform: translateY(-4px); background: var(--bg-2); }
+.fcard.wide { grid-column: span 3; }
+.fcard.big { grid-column: span 3; min-height: 230px; }
+.fcard .fi { width: 40px; height: 40px; border-radius: var(--r-sm); background: var(--bg-3); display: grid; place-items: center; }
+.fcard .fi svg { width: 20px; height: 20px; fill: none; stroke: var(--white); stroke-width: 1.6; }
+.fcard h3 { font-size: 17px; font-weight: 700; }
+.fcard p { color: var(--fg-dim); font-size: 14px; margin: 0; line-height: 1.55; }
+.fcard .tag { margin-top: auto; align-self: flex-start; font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; color: var(--fg-dim); text-transform: uppercase; padding: 4px 9px; border: 1px solid var(--line); border-radius: var(--pill); background: var(--bg-2); }
+.fcard.art { position: relative; overflow: hidden; align-items: stretch; }
+.fcard.art .fart { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 38% 30%; opacity: .6; transition: opacity .4s, transform .8s var(--ease); }
+.fcard.art:hover .fart { opacity: .75; transform: scale(1.03); }
+.fcard.art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(17,17,22,0) 20%, rgba(17,17,22,.92) 78%); pointer-events: none; }
+.fcard.art .lbl { z-index: 2; }
+.fcard.art .lbl { position: relative; z-index: 1; margin-top: auto; }
+
+/* download */
+.dl { display: grid; grid-template-columns: 1.1fr .9fr; gap: 24px; align-items: center; margin-top: 30px; }
+.dl-card { border: 1px solid var(--line-2); border-radius: var(--r); background: linear-gradient(180deg, var(--bg-2), var(--panel)); padding: 28px; }
+.dl-media { position: relative; margin: -12px -12px 22px; border-radius: var(--r-md); overflow: hidden; background: #000; border: 1px solid var(--line); aspect-ratio: 3 / 1; }
+.dl-media video { width: 100%; height: 100%; object-fit: contain; padding: 6px 10px; object-position: center; display: block; }
+.dl-media span { position: absolute; left: 12px; bottom: 10px; font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; color: var(--fg-dim); }
+.dl-card .v { font-family: var(--mono); font-size: 12px; color: var(--fg-dim); letter-spacing: .08em; }
+.dl-card h2 { font-size: 30px; font-weight: 900; letter-spacing: -.01em; margin: 8px 0 6px; }
+.dl-card p { color: var(--fg-dim); margin: 0 0 22px; max-width: 42ch; }
+.dl-card .btn { font-size: 15px; padding: 15px 26px; }
+.dl-facts { display: grid; gap: 14px; }
+.dl-fact { display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); }
+.dl-fact svg { width: 34px; height: 34px; padding: 7px; border-radius: var(--r-sm); background: var(--bg-3); fill: none; stroke: var(--white); stroke-width: 1.8; flex: none; }
+.dl-fact b { display: block; font-weight: 700; }
+.dl-fact span { color: var(--fg-dim); font-size: 13px; }
+.dl-note { margin-top: 14px; color: var(--fg-faint); font-size: 12.5px; line-height: 1.5; }
+
+/* morphing highlight group */
+.hlgroup { position: relative; display: inline-flex; gap: 2px; padding: 4px; border: 1px solid var(--line); border-radius: var(--pill); background: var(--panel); flex-wrap: wrap; isolation: isolate; }
+.hlgroup .hl { position: absolute; top: 0; left: 0; z-index: 0; border-radius: var(--pill); background: var(--white); opacity: 0; }
+.hlgroup button { position: relative; z-index: 1; padding: 8px 15px; font-size: 12.5px; font-weight: 600; letter-spacing: .04em; color: var(--fg-dim); border-radius: var(--pill); transition: color .3s; white-space: nowrap; }
+.hlgroup button:hover { color: var(--fg); }
+.hlgroup button[aria-selected="true"] { color: var(--bg); }
+
+/* shop */
+.plans { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 26px; }
+.plan { position: relative; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); padding: 26px; overflow: hidden; transition: border-color .3s, transform .4s var(--ease); }
+.plan:hover { border-color: var(--line-2); transform: translateY(-4px); }
+.plan.featured { border-color: rgba(255,255,255,.28); background: linear-gradient(180deg, var(--bg-3), var(--panel) 70%); }
+.plan .crest { position: absolute; right: -24px; top: -24px; width: 150px; height: 150px; opacity: .35; }
+.plan .tier { font-size: 11px; letter-spacing: .2em; color: var(--fg-dim); }
+.plan h3 { font-size: 28px; font-weight: 900; letter-spacing: .02em; margin: 6px 0 2px; }
+.plan .pop { position: absolute; top: 20px; right: 20px; font-size: 10px; font-weight: 800; letter-spacing: .1em; padding: 5px 11px; border-radius: var(--pill); background: var(--btn); color: var(--bg); }
+.plan .price { font-family: var(--mono); font-size: 34px; font-weight: 700; margin: 16px 0 2px; }
+.plan .price span { font-size: 13px; color: var(--fg-dim); font-weight: 400; }
+.plan ul { list-style: none; margin: 18px 0 22px; padding: 0; display: grid; gap: 11px; }
+.plan li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--fg-dim); }
+.plan li svg { width: 16px; height: 16px; fill: none; stroke: var(--white); stroke-width: 2.2; flex: none; margin-top: 1px; }
+.plan .btn { width: 100%; }
+
+/* cart / checkout */
+.cart-grid { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+.cart-item { display: flex; align-items: center; gap: 16px; padding: 16px; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); margin-bottom: 10px; }
+.cart-item .ci-crest { width: 48px; height: 48px; flex: none; }
+.cart-item .ci-name { font-weight: 800; font-size: 16px; letter-spacing: .02em; }
+.cart-item .ci-sub { font-size: 12px; color: var(--fg-dim); }
+.cart-item .ci-price { margin-left: auto; font-family: var(--mono); font-weight: 700; }
+.cart-item .ci-rm { color: var(--fg-faint); font-size: 12px; margin-left: 14px; transition: color .2s; }
+.cart-item .ci-rm:hover { color: var(--fg); }
+.empty { border: 1px dashed var(--line-2); border-radius: var(--r); padding: 40px; text-align: center; background: var(--panel); }
+.empty b { font-size: 16px; }
+.pay { border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); padding: 20px; }
+.pay h3 { font-size: 12px; letter-spacing: .14em; color: var(--fg-dim); margin-bottom: 14px; }
+.subtotal { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; }
+.subtotal b { font-family: var(--mono); font-size: 24px; font-weight: 700; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 12.5px; color: var(--fg-dim); margin-bottom: 7px; }
+.field input, .field textarea { width: 100%; padding: 12px 14px; background: var(--bg); border: 1px solid var(--line-2); border-radius: var(--r-md); color: var(--fg); font: inherit; font-size: 14px; outline: none; transition: border-color .2s, box-shadow .2s; }
+.field textarea { resize: vertical; min-height: 110px; }
+.field input::placeholder, .field textarea::placeholder { color: var(--fg-faint); }
+.field input:focus, .field textarea:focus { border-color: var(--white); box-shadow: 0 0 0 3px rgba(255,255,255,.1); }
+.field .err { color: #ffb4b4; font-size: 12px; margin-top: 6px; min-height: 14px; }
+.pay-note { font-size: 12px; color: var(--fg-faint); margin-top: 12px; text-align: center; line-height: 1.5; }
+.deliver { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--r); margin-bottom: 16px; font-size: 12.5px; }
+.deliver .ava { width: 26px; height: 26px; border-radius: 50%; background: var(--white); color: var(--bg); display: grid; place-items: center; font-size: 11px; font-weight: 800; }
+.done-state { text-align: center; padding: 10px 0; }
+.done-state .mark { width: 54px; height: 54px; margin: 0 auto 14px; border-radius: 50%; border: 1px solid var(--line-2); display: grid; place-items: center; }
+.done-state .mark svg { width: 24px; height: 24px; fill: none; stroke: var(--white); stroke-width: 2; }
+.done-state b { font-size: 17px; }
+
+/* contact */
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; margin-top: 28px; }
+.social { display: grid; gap: 12px; }
+.social a { display: flex; align-items: center; gap: 14px; padding: 18px; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); transition: border-color .3s, transform .35s var(--ease), background-color .3s; }
+.social a:hover { border-color: var(--line-2); transform: translateX(4px); background: var(--bg-2); }
+.social .si { width: 42px; height: 42px; border-radius: var(--r-sm); background: var(--bg-3); display: grid; place-items: center; flex: none; }
+.social .si svg { width: 20px; height: 20px; }
+.social b { display: block; font-weight: 700; }
+.social span { color: var(--fg-dim); font-size: 13px; }
+.social .arr { margin-left: auto; color: var(--fg-dim); }
+.cform { border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); padding: 22px; }
+.cform h3 { font-size: 12px; letter-spacing: .14em; color: var(--fg-dim); margin-bottom: 16px; }
+
+/* footer */
+.foot { border-top: 1px solid var(--line); margin-top: 60px; }
+.foot .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 28px; padding-block: 26px; }
+.foot .fb { display: flex; align-items: center; gap: 9px; font-weight: 800; letter-spacing: .14em; font-size: 12px; }
+.foot .fb img { width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--line); display: block; }
+.foot .fnote { color: var(--fg-faint); font-size: 12px; max-width: 48ch; }
+.foot .flinks { margin-left: auto; display: flex; gap: 20px; font-size: 12.5px; }
+.foot .flinks a { color: var(--fg-dim); transition: color .2s; }
+.foot .flinks a:hover { color: var(--fg); }
+
+.toast { position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px); z-index: 80; padding: 11px 18px; border-radius: var(--pill); background: var(--white); color: var(--bg); font-size: 13px; font-weight: 700; opacity: 0; pointer-events: none; transition: transform .4s var(--ease), opacity .3s; box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+
+/* ===== features: the big card is a stage; click a feature to swap it in ===== */
+.bento { grid-auto-flow: dense; position: relative; }
+.fcard { cursor: pointer; position: relative; overflow: hidden; }
+.fcard:hover { transform: none; }
+.fcard.s1, .fcard.s2, .fcard.s3, .fcard.s4, .fcard.s5 { grid-column: span 2; }
+.fcard.s6, .fcard.s7 { grid-column: span 3; }
+.fcard.hero { grid-column: span 4; grid-row: span 2; cursor: default; border-color: rgba(255,255,255,.26); background: linear-gradient(180deg, var(--bg-3), var(--panel) 60%); padding: 18px 18px 22px; gap: 14px; }
+.fcard .shot { display: none; }
+.fcard.hero .shot { display: block; position: relative; border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--line); background: #0b0b0e; aspect-ratio: 16 / 8.2; }
+.fcard.hero .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fcard.hero .shot::after { content: ""; position: absolute; inset: auto 0 0; height: 30%; background: linear-gradient(180deg, rgba(17,17,22,0), rgba(17,17,22,.55)); pointer-events: none; }
+.fcard .lbl { display: flex; flex-direction: column; gap: 10px; flex: 1; position: relative; z-index: 1; }
+.fcard.hero .lbl { padding: 0 6px; gap: 12px; }
+.fcard .long, .fcard .more { display: none; }
+.fcard.hero .short { display: none; }
+.fcard.hero .long { display: block; margin: 0; color: var(--fg); font-size: 16px; line-height: 1.6; max-width: 68ch; }
+.fcard.hero .long .w { display: inline-block; white-space: pre; }
+.fcard.hero .more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 22px; margin: 2px 0 0; padding: 0; list-style: none; }
+.fcard.hero .more li { display: flex; gap: 10px; color: var(--fg-dim); font-size: 13.5px; line-height: 1.5; }
+.fcard.hero .more li::before { content: ""; flex: none; width: 6px; height: 6px; margin-top: 7px; border-radius: 50%; background: var(--fg-dim); }
+.fcard.hero h3 { font-size: clamp(22px, 2.6vw, 30px); font-weight: 900; letter-spacing: -.01em; }
+.fcard .head { display: flex; align-items: center; gap: 12px; }
+.fcard .open-hint { position: absolute; top: 16px; right: 16px; width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; color: var(--fg-dim); transition: background-color .25s, color .25s, border-color .25s; z-index: 2; }
+.fcard .open-hint svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
+.fcard:not(.hero):hover .open-hint { background: var(--btn); color: var(--bg); border-color: transparent; }
+.fcard:not(.hero):hover { border-color: var(--line-2); background: var(--bg-2); }
+.fcard.hero .open-hint { display: none; }
+.fcard .tag { margin-top: auto; }
+.fcard.hero .tag { margin-top: 2px; }
+.fcard:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.fcard.swapping { visibility: hidden; }
+.fghost { position: absolute; z-index: 4; border: 1px solid var(--line-2); border-radius: var(--r); background: var(--bg-2); pointer-events: none; overflow: hidden; }
+.fghost-head { position: absolute; left: 20px; top: 20px; display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+.fghost-head .fi { width: 40px; height: 40px; border-radius: var(--r-sm); background: var(--bg-3); display: grid; place-items: center; flex: none; }
+.fghost-head .fi svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 1.6; }
+.fghost-head h3 { margin: 0; font-size: 17px; font-weight: 700; }
+@media (max-width: 680px) { .fcard.hero .more { grid-template-columns: 1fr; } }
+
+/* ===== download: platforms, then the Windows warning explained ===== */
+.plat { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 14px; margin-top: 30px; align-items: stretch; }
+.pcard { border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); padding: 24px; display: flex; flex-direction: column; gap: 10px; }
+.pcard.ready { border-color: var(--line-2); background: linear-gradient(180deg, var(--bg-2), var(--panel)); }
+.pcard .os { display: flex; align-items: center; gap: 12px; }
+.pcard .os svg { width: 30px; height: 30px; flex: none; }
+.pcard h2 { font-size: 26px; font-weight: 900; letter-spacing: -.01em; margin: 0; }
+.pcard p { color: var(--fg-dim); margin: 0; font-size: 14px; }
+.status { align-self: flex-start; font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; padding: 4px 10px; border-radius: var(--pill); border: 1px solid var(--line); color: var(--fg-dim); background: var(--bg-2); }
+.status.ok { background: var(--btn); color: var(--bg); border-color: transparent; font-weight: 700; }
+.pcard .btn { margin-top: auto; align-self: flex-start; }
+.pcard.ready .btn { font-size: 15px; padding: 14px 24px; }
+.pcard .mini-facts { display: flex; flex-wrap: wrap; gap: 6px; }
+.pcard .mini-facts span { font-size: 12px; color: var(--fg-dim); padding: 4px 10px; border-radius: var(--pill); border: 1px solid var(--line); }
+.pcard .dl-media { margin: -8px -8px 6px; }
+.sum { border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg-2); padding: 10px 14px; font-size: 13px; color: var(--fg-dim); }
+.sum summary { cursor: pointer; color: var(--fg); font-weight: 600; }
+.sum p { margin: 8px 0; }
+.sum code { font-family: var(--mono); font-size: 12px; color: var(--fg); }
+.sum .hash { display: block; padding: 8px 10px; border-radius: var(--r-sm); background: var(--bg); border: 1px solid var(--line); overflow-wrap: anywhere; user-select: all; }
+.steps-list { list-style: none; counter-reset: st; margin: 0 0 16px; padding: 0; display: grid; gap: 12px; }
+.steps-list li { counter-increment: st; display: grid; grid-template-columns: 28px 1fr; gap: 2px 10px; font-size: 14px; }
+.steps-list li::before { content: counter(st); grid-row: span 2; width: 26px; height: 26px; border-radius: 50%; background: var(--btn); color: var(--bg); display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+.steps-list li span { color: var(--fg-dim); font-size: 13px; }
+.legal-body { max-width: 72ch; margin-top: 26px; color: var(--fg-dim); font-size: 15px; line-height: 1.7; }
+.legal-body h2 { color: var(--fg); font-size: 19px; font-weight: 800; margin: 30px 0 8px; }
+.legal-body p { margin: 0 0 12px; }
+.legal-body ul { margin: 0 0 12px; padding-left: 20px; display: grid; gap: 6px; }
+.legal-body b { color: var(--fg); }
+.legal-body a, .kofi-agree a { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
+.kofi-agree { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 18px; padding: 12px 14px; border: 1px solid var(--line-2); border-radius: var(--r-md); background: var(--bg); font-size: 13px; color: var(--fg-dim); line-height: 1.5; cursor: pointer; }
+.kofi-agree input { width: 18px; height: 18px; margin: 1px 0 0; flex: none; accent-color: #fff; }
+.kofi-agree b { color: var(--fg); }
+.kofi-actions .btn:disabled { opacity: .45; cursor: not-allowed; }
+.kofi-modal { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 16px; background: rgba(0,0,0,.7); backdrop-filter: blur(6px); }
+.kofi-box { width: min(480px, 100%); max-height: calc(100dvh - 32px); overflow: auto; border: 1px solid var(--line-2); border-radius: var(--r); background: linear-gradient(180deg, var(--bg-3), var(--panel)); padding: 24px; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+.kofi-box h2 { font-size: 22px; font-weight: 900; margin: 0 0 16px; }
+.kofi-box .steps-list { margin-bottom: 20px; }
+.kofi-email { overflow-wrap: anywhere; color: var(--fg); }
+.kofi-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.kofi-actions .btn { min-width: 120px; }
+@media (max-width: 680px) { .kofi-actions .btn { flex: 1; } }
+.linkish { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; font-size: 13px; }
+.warn { margin-top: 56px; display: grid; gap: 18px; }
+.warn h2 { font-size: clamp(22px, 3vw, 30px); font-weight: 900; letter-spacing: -.01em; }
+.warn > p { color: var(--fg-dim); margin: -8px 0 0; max-width: 64ch; }
+.steps { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.step { border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); padding: 18px; display: grid; gap: 14px; }
+.step .num { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+.step .num span { width: 28px; height: 28px; border-radius: 50%; background: var(--btn); color: var(--bg); display: grid; place-items: center; font-weight: 900; font-size: 13px; }
+.ss { border-radius: var(--r-md); background: #0f3b6b; border: 1px solid #2f74c0; padding: 18px 20px; color: #fff; display: grid; gap: 10px; font-family: "Segoe UI", system-ui, sans-serif; min-height: 200px; }
+.ss .ss-title { font-size: 20px; font-weight: 600; letter-spacing: -.01em; }
+.ss .ss-text { font-size: 13px; color: #d7e7fb; line-height: 1.5; }
+.ss .ss-link { justify-self: start; font-size: 13px; color: #fff; text-decoration: underline; padding: 2px 6px; margin-left: -6px; border-radius: 6px; outline: 2px solid #fff; outline-offset: 2px; animation: hint 1.6s ease-in-out infinite; }
+.ss .ss-kv { font-size: 12.5px; color: #d7e7fb; display: grid; grid-template-columns: auto 1fr; gap: 3px 14px; }
+.ss .ss-btns { display: flex; justify-content: flex-end; gap: 8px; margin-top: auto; }
+.ss .ss-btns span { font-size: 13px; padding: 6px 18px; border-radius: 4px; border: 1px solid #9cc7f5; color: #fff; }
+.ss .ss-btns span.go { background: #fff; color: #0f3b6b; font-weight: 600; outline: 2px solid #fff; outline-offset: 2px; animation: hint 1.6s ease-in-out infinite; }
+@keyframes hint { 50% { outline-color: rgba(255,255,255,.25); } }
+.warn .once { color: var(--fg-faint); font-size: 12.5px; }
+
+/* ===== shop: Free vs Pro ===== */
+.matrix-wrap { margin-top: 26px; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); }
+.matrix { display: grid; grid-template-columns: minmax(200px, 1.7fr) repeat(2, minmax(160px, 1fr)); min-width: 540px; }
+.matrix > div { padding: 13px 18px; border-top: 1px solid var(--line); display: flex; align-items: center; font-size: 14px; }
+.matrix > .mh { border-top: 0; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 6px; padding-top: 22px; padding-bottom: 18px; }
+.matrix .col-pro { background: rgba(255,255,255,.045); }
+.matrix .mh .tier { font-size: 11px; letter-spacing: .18em; color: var(--fg-dim); font-family: var(--mono); }
+.matrix .mh h3 { font-size: 20px; font-weight: 900; letter-spacing: .02em; display: flex; align-items: center; gap: 8px; }
+.matrix .mh .pop { font-size: 9.5px; font-weight: 800; letter-spacing: .1em; padding: 4px 9px; border-radius: var(--pill); background: var(--btn); color: var(--bg); }
+.matrix .mh .price { font-family: var(--mono); font-size: 24px; font-weight: 700; }
+.matrix .mh .price span { font-size: 12px; color: var(--fg-dim); font-weight: 400; }
+.matrix .mh .btn { width: 100%; margin-top: 6px; padding: 10px 14px; }
+.matrix .feat { color: var(--fg); font-weight: 600; }
+.matrix .feat small { display: block; color: var(--fg-faint); font-weight: 400; font-size: 12px; }
+.matrix .feat { flex-direction: column; align-items: flex-start; justify-content: center; }
+.matrix .yes svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 2.4; }
+.matrix .no { color: var(--fg-faint); }
+.matrix .group { grid-column: 1 / -1; font-family: var(--mono); font-size: 11px; letter-spacing: .14em; color: var(--fg-dim); background: var(--bg-2); padding: 9px 18px; }
+.shop-note { margin-top: 16px; color: var(--fg-faint); font-size: 12.5px; }
+
+/* ===== contact: the makers, then answers you can search ===== */
+.makers { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 14px; margin-top: 28px; }
+.maker { border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); padding: 22px; display: grid; gap: 10px; align-content: start; }
+.maker .face { width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center; font-weight: 900; font-size: 26px; color: var(--bg); background: var(--btn); }
+.maker h3 { font-size: 20px; font-weight: 900; }
+.maker .handle { font-family: var(--mono); font-size: 12.5px; color: var(--fg-dim); }
+.maker p { margin: 0; color: var(--fg-dim); font-size: 14px; }
+.maker .btn { justify-self: start; margin-top: 4px; }
+.maker.discord { border-color: var(--line-2); background: linear-gradient(180deg, var(--bg-3), var(--panel)); }
+.maker.discord .face { background: #5865f2; }
+.maker.discord .face svg { width: 32px; height: 32px; }
+.jump { display: inline-flex; gap: 6px; align-items: center; color: var(--fg-dim); font-size: 13px; margin-top: 12px; }
+.jump:hover { color: var(--fg); }
+.answers { margin-top: 64px; scroll-margin-top: calc(84px + env(safe-area-inset-top, 0px)); }
+.answers h2, .write h2 { font-size: clamp(22px, 3vw, 30px); font-weight: 900; letter-spacing: -.01em; }
+.search { position: relative; margin-top: 16px; }
+.search svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; fill: none; stroke: var(--fg-dim); stroke-width: 2; }
+.search input { width: 100%; padding: 16px 18px 16px 46px; border-radius: var(--pill); border: 1px solid var(--line-2); background: var(--panel); color: var(--fg); font: inherit; font-size: 16px; outline: none; }
+.search input:focus { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.1); }
+.faq { display: grid; gap: 10px; margin-top: 14px; }
+.faq details { border: 1px solid var(--line); border-radius: var(--r-md); background: var(--panel); }
+.faq summary { cursor: pointer; list-style: none; padding: 15px 18px; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; margin-left: auto; color: var(--fg-dim); font-size: 18px; font-weight: 400; transition: transform .25s var(--ease); }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq .a { padding: 0 18px 16px; color: var(--fg-dim); font-size: 14px; max-width: 72ch; }
+.faq mark { background: rgba(255,255,255,.18); color: var(--fg); border-radius: 3px; padding: 0 2px; }
+.faq-empty { border: 1px dashed var(--line-2); border-radius: var(--r-md); padding: 22px; color: var(--fg-dim); text-align: center; }
+.faq-count { margin-top: 10px; color: var(--fg-faint); font-size: 12.5px; }
+.write { margin-top: 56px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; align-items: start; }
+.write .lede { margin-top: 8px; }
+
+@media (max-width: 920px) {
+  .fcard.hero { grid-column: 1 / -1; grid-row: auto; min-height: 340px; }
+  .fcard.s1, .fcard.s2, .fcard.s3, .fcard.s4, .fcard.s5, .fcard.s6, .fcard.s7 { grid-column: span 1; }
+  .plat { grid-template-columns: 1fr 1fr; } .pcard.ready { grid-column: 1 / -1; }
+  .steps, .write { grid-template-columns: 1fr; }
+  .makers { grid-template-columns: 1fr 1fr; } .maker.discord { grid-column: 1 / -1; }
+}
+@media (max-width: 680px) {
+  .plat, .makers { grid-template-columns: 1fr; }
+  .fcard.hero { min-height: 0; }
+}
+
+@media (max-width: 920px) {
+  .hero-grid { grid-template-columns: 1fr; } .hero-art { height: 260px; order: -1; } .knot-wrap { width: 100%; margin-left: 0; }
+  .tiles { grid-template-columns: 1fr 1fr; }
+  .bento { grid-template-columns: 1fr 1fr; } .fcard, .fcard.wide, .fcard.big { grid-column: span 1; min-height: 0; }
+  .dl, .cart-grid, .contact-grid, .plans { grid-template-columns: 1fr; }
+}
+@media (max-width: 680px) {
+  .nav-links { display: none; }
+  .nav-burger { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid var(--line); border-radius: var(--pill); }
+  .nav-burger svg { width: 18px; height: 18px; stroke: var(--fg); fill: none; stroke-width: 1.8; }
+  .brand b { font-size: 12px; }
+  .tiles { grid-template-columns: 1fr; } .bento { grid-template-columns: 1fr; }
+  .foot .flinks { margin-left: 0; width: 100%; }
+}
+/* ===== account: log in once, stays 30 days ===== */
+.acct-btn.hidden { display: none; }
+.acct-btn.in::after { content: ""; position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; border-radius: 50%; background: var(--white); box-shadow: 0 0 0 2px var(--bg); }
+.acct-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: 28px; align-items: start; margin-top: 28px; }
+.acct-card { border: 1px solid var(--line-2); border-radius: var(--r); background: linear-gradient(180deg, var(--bg-2), var(--panel)); padding: 24px; }
+.acct-card h3 { font-size: 12px; letter-spacing: .14em; color: var(--fg-dim); margin-bottom: 16px; }
+.acct-tabs { display: inline-flex; gap: 2px; padding: 4px; border: 1px solid var(--line); border-radius: var(--pill); background: var(--panel); margin-bottom: 18px; }
+.acct-tabs button { padding: 8px 15px; border-radius: var(--pill); font-size: 12.5px; font-weight: 600; color: var(--fg-dim); transition: background-color .25s, color .25s; }
+.acct-tabs button.on { background: var(--white); color: var(--bg); }
+.acct-card .btn { width: 100%; }
+.acct-code input { font-family: var(--mono); font-size: 26px; letter-spacing: .4em; text-align: center; }
+.acct-row { display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; font-size: 13px; }
+.acct-row button { color: var(--fg-dim); text-decoration: underline; text-underline-offset: 3px; }
+.acct-row button:hover { color: var(--fg); }
+.acct-facts { display: grid; gap: 10px; margin: 4px 0 20px; }
+.acct-facts div { display: flex; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--bg); font-size: 14px; }
+.acct-facts span { color: var(--fg-dim); }
+.acct-facts b { font-weight: 700; text-align: right; overflow-wrap: anywhere; }
+.acct-why { display: grid; gap: 12px; }
+.acct-why div { display: flex; gap: 14px; padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); }
+.acct-why svg { width: 34px; height: 34px; padding: 7px; border-radius: var(--r-sm); background: var(--bg-3); fill: none; stroke: var(--white); stroke-width: 1.8; flex: none; }
+.acct-why b { display: block; font-weight: 700; }
+.acct-why span { color: var(--fg-dim); font-size: 13px; }
+@media (max-width: 920px) { .acct-wrap { grid-template-columns: 1fr; } }
+/* ===== phones ===== */
+@media (max-width: 680px) {
+  /* top bar: logo, cart, account and menu fit; Download is in the hero and the menu */
+  .nav { height: 58px; }
+  .nav .wrap { gap: 10px; }
+  .nav-right { gap: 8px; margin-left: auto; }
+  .nav-right .btn-get { display: none; }
+  .cart-btn, .nav-burger { width: 42px; height: 42px; }
+  .page-pad { padding-block: 34px 56px; }
+  .section-title { font-size: 30px; }
+  .hero { padding-top: 22px; }
+  .hero-badge { font-size: 10.5px; letter-spacing: .1em; }
+  .hero-cta .btn { flex: 1 1 100%; }
+  /* the shop table fits the screen: no sideways scrolling to find Lifetime */
+  .matrix { min-width: 0; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr); }
+  .matrix > div { padding: 11px 10px; font-size: 13px; }
+  .matrix > div:not(.feat):not(.group):not(.mh) { justify-content: center; }
+  .matrix > .mh { padding: 16px 10px 14px; gap: 4px; }
+  .matrix .mh h3 { font-size: 15px; }
+  .matrix .mh .price { font-size: 17px; }
+  .matrix .mh .price span { display: block; font-size: 11px; }
+  .matrix .mh .btn { padding: 9px 6px; font-size: 12px; white-space: normal; text-align: center; }
+  .matrix .feat small { font-size: 11px; }
+  .matrix .group { padding: 8px 10px; }
+  .dl-media span { display: none; }
+  /* typing doesn't zoom the page on iPhones (it does for text under 16px) */
+  .field input, .field textarea, .search input { font-size: 16px; }
+  .acct-code input { font-size: 24px; }
+  .cart-item { flex-wrap: wrap; gap: 10px 14px; }
+  .ss { min-height: 0; }
+  .mobmenu a { padding: 14px 8px; }
+}
+@media (max-width: 340px) { .brand b { display: none; } }
+/* touch screens: no hover lift that stays stuck after a tap, no grey flash on tap */
+@media (hover: none) {
+  .tile:hover, .fcard:hover, .plan:hover, .social a:hover, .cart-btn:hover, .btn-get:hover { transform: none; }
+  a, button, .fcard, [role="button"] { -webkit-tap-highlight-color: transparent; }
+}
+.mobmenu { position: fixed; inset: 0; z-index: 70; background: var(--bg); display: none; flex-direction: column; padding: 80px 24px 24px; gap: 4px; }
+.mobmenu.open { display: flex; }
+.mobmenu a { padding: 16px 8px; font-size: 20px; font-weight: 800; letter-spacing: .04em; border-bottom: 1px solid var(--line); }
+.mobmenu .mclose { position: absolute; top: 18px; right: 20px; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: var(--pill); font-size: 20px; }
+@media (prefers-reduced-motion: reduce) { .knot-wrap.shake { animation: none; } * { animation-duration: .001ms !important; transition-duration: .08s !important; } .cur-grid, .cur-blob { display: none; } }
+</style>
+
+<canvas class="cur-grid" aria-hidden="true"></canvas>
+<div class="cur-blob" aria-hidden="true"></div>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="#home" data-link><img src="texfinity-cube-128.png" alt="" width="30" height="30"><b>TEXFINITY</b></a>
+    <div class="nav-links" id="navLinks">
+      <span class="nav-pill" id="navPill"></span>
+      <a class="nav-link" href="#home" data-page="home" data-link>HOME</a>
+      <a class="nav-link" href="#features" data-page="features" data-link>FEATURES</a>
+      <a class="nav-link" href="#download" data-page="download" data-link>DOWNLOAD</a>
+      <a class="nav-link" href="#shop" data-page="shop" data-link>SHOP</a>
+      <a class="nav-link" href="#contact" data-page="contact" data-link>CONTACT</a>
+    </div>
+    <div class="nav-right">
+      <a class="cart-btn" href="#cart" data-link aria-label="Cart"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 12.3a1 1 0 0 0 1 .8h8.7a1 1 0 0 0 1-.8L21 8H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="18" cy="20" r="1.3"/></svg><span class="cart-count" id="cartCount">0</span></a>
+      <a class="cart-btn acct-btn hidden" id="acctBtn" href="#account" data-link aria-label="Your account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></a>
+      <a class="btn-get" href="#download" data-link><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>Download</a>
+      <button class="nav-burger" id="burger" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
+  </div>
+</nav>
+
+<div class="mobmenu" id="mobmenu">
+  <button class="mclose" id="mclose" aria-label="Close">&times;</button>
+  <a href="#home" data-link>Home</a>
+  <a href="#features" data-link>Features</a>
+  <a href="#download" data-link>Download</a>
+  <a href="#shop" data-link>Shop</a>
+  <a href="#contact" data-link>Contact</a>
+  <a href="#account" data-link id="acctMob" hidden>Account</a>
+</div>
+
+<main>
+  <!-- HOME -->
+  <section class="page active" id="page-home" data-page="home">
+    <div class="wrap hero">
+      <div class="hero-grid">
+        <div>
+          <span class="hero-badge reveal"><span class="dot"></span>MINECRAFT JAVA / TEXTURE PACK MAKER</span>
+          <h1 class="reveal" id="heroTitle"><span class="line"><span class="w">TEX</span></span><span class="line"><span class="w">FINITY</span></span></h1>
+          <p class="hero-sub reveal">Make Minecraft texture packs that never run out of ideas. Paint, model in 3D, generate skies, write plugins, and ship a finished pack. All in one app.</p>
+          <div class="hero-cta reveal">
+            <a class="btn btn-primary" href="#download" data-link data-mag><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>Download for Windows</a>
+            <a class="btn btn-ghost" href="#features" data-link data-mag>See what it does</a>
+          </div>
+        </div>
+        <div class="hero-art reveal">
+          <div class="knot-wrap" id="knot" role="button" tabindex="0" aria-label="The Texfinity knot. Click to make the snakes hiss">
+            <video src="texfinity-knot.mp4" autoplay muted loop playsinline preload="auto"></video>
+            <canvas width="960" height="320"></canvas>
+            <span class="knot-hint">CLICK ME</span>
+          </div>
+          <span class="hero-meta mono">FREE / PORTABLE / 1.21+ AND OLDER</span>
+        </div>
+      </div>
+      <div class="tiles">
+        <a class="tile reveal" href="#features" data-link><span class="ti"><svg viewBox="0 0 24 24"><path d="M12 19l7-7-4-4-7 7v4zM15 6l3 3"/></svg></span><b>Paint editor</b><span class="arr">&rarr;</span></a>
+        <a class="tile reveal" href="#features" data-link><span class="ti"><svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg></span><b>3D models</b><span class="arr">&rarr;</span></a>
+        <a class="tile reveal" href="#features" data-link><span class="ti"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2"/></svg></span><b>Skyboxes</b><span class="arr">&rarr;</span></a>
+        <a class="tile reveal" href="#features" data-link><span class="ti"><svg viewBox="0 0 24 24"><path d="M9 3v4M15 3v4M7 7h10v4a5 5 0 0 1-10 0z"/><path d="M12 16v5"/></svg></span><b>Plugins</b><span class="arr">&rarr;</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="page" id="page-features" data-page="features">
+    <div class="wrap page-pad">
+      <h1 class="section-title reveal">Everything in one app</h1>
+      <p class="lede reveal">Texfinity is a full workshop for Minecraft Java resource packs. No plugins to hunt down, no five separate tools.</p>
+      <div class="bento" id="bento"></div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section class="page" id="page-download" data-page="download">
+    <div class="wrap page-pad">
+      <h1 class="section-title reveal">Download Texfinity</h1>
+      <p class="lede reveal">One file. Nothing to install. Open it and start a pack.</p>
+      <div class="plat">
+        <div class="pcard ready reveal">
+          <div class="dl-media"><video src="texfinity-knot.mp4" autoplay muted loop playsinline preload="auto" aria-label="The Texfinity knot: two snakes woven into an endless double loop"></video><span>THE TEXFINITY KNOT</span></div>
+          <div class="os"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M3 5.5l7.5-1v7H3zM11.5 4.3L21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zM11.5 12.5H21V21l-9.5-1.3z"/></svg><h2>Windows</h2><span class="status ok">READY</span></div>
+          <div class="v mono" id="dlVer" style="font-size:12px;color:var(--fg-dim);letter-spacing:.08em">VERSION 0.9.52 / WINDOWS 10 AND 11 / 78 MB</div>
+          <p>The full app in one portable .exe: paint editor, 3D model editor, skybox generator, plugins, Upscale, Showcase and more.</p>
+          <div class="mini-facts"><span>No installer</span><span>Minecraft Java 1.6 to latest</span><span>Free core app</span></div>
+          <details class="sum"><summary>Check it's the official file</summary><p>Only download Texfinity from here or our Discord. To be sure your copy hasn't been changed, open PowerShell in the folder with the file and run <code>Get-FileHash "Texfinity 0.9.52.exe"</code>. It should show exactly:</p><code class="hash" id="dlHash">B7C0079EE22B1B76A1D9AD8E0B8FE77F14A650BE604A72164E6B8403491BDEBF</code><p>If it doesn't match, delete the file and tell us on Discord.</p></details>
+          <a class="btn btn-primary" id="dlBtn" href="https://discord.gg/texfinity" target="_blank" data-mag><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>Download the .exe</a>
+        </div>
+        <div class="pcard reveal">
+          <div class="os"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#cfd0d6" d="M16.4 12.6c0-2.4 2-3.5 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8 1.5 0 1.9.8 3.2.8 1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.5-1-2.5-4zM14 5.4c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.6 2.8-1.4z"/></svg><h2>macOS</h2></div>
+          <span class="status">NOT YET</span>
+          <p>Texfinity is Windows only for now. Join the Discord and you will hear first when a Mac build is ready.</p>
+          <a class="btn btn-ghost" href="https://discord.gg/texfinity" target="_blank">Tell me on Discord</a>
+        </div>
+        <div class="pcard reveal">
+          <div class="os"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#cfd0d6" d="M12 2c-2 0-3.3 1.7-3.3 4.2 0 1.3.3 2.3-.4 3.5-.8 1.4-2.7 3.4-2.7 6 0 1.3.4 2.2 1 2.8-.5.5-1.6.6-1.6 1.6 0 .8 1.4 1.4 3.4 1.6 1.2.1 1.9-.5 2.4-.9.5.1 1 .1 1.5.1s1-.1 1.5-.1c.5.4 1.2 1 2.4.9 2-.2 3.4-.8 3.4-1.6 0-1-1.1-1.1-1.6-1.6.6-.6 1-1.5 1-2.8 0-2.6-1.9-4.6-2.7-6-.7-1.2-.4-2.2-.4-3.5C15.3 3.7 14 2 12 2zm-1.5 4a.8.8 0 110 1.6.8.8 0 010-1.6zm3 0a.8.8 0 110 1.6.8.8 0 010-1.6z"/></svg><h2>Linux</h2></div>
+          <span class="status">NOT YET</span>
+          <p>No Linux build yet either. Ask for it on Discord: the more people who do, the sooner it happens.</p>
+          <a class="btn btn-ghost" href="https://discord.gg/texfinity" target="_blank">Tell me on Discord</a>
+        </div>
+      </div>
+
+      <section class="warn reveal" aria-labelledby="warnTitle">
+        <h2 id="warnTitle">If Windows warns you</h2>
+        <p>Texfinity is new and isn't signed with a paid certificate yet, so Windows SmartScreen may stop it the first time you open it. Here is exactly what to click.</p>
+        <div class="steps">
+          <div class="step">
+            <div class="num"><span>1</span>Click "More info"</div>
+            <div class="ss" aria-hidden="true">
+              <div class="ss-title">Windows protected your PC</div>
+              <div class="ss-text">Microsoft Defender SmartScreen prevented an unrecognised app from starting. Running this app might put your PC at risk.</div>
+              <span class="ss-link">More info</span>
+              <div class="ss-btns"><span>Don't run</span></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="num"><span>2</span>Click "Run anyway"</div>
+            <div class="ss" aria-hidden="true">
+              <div class="ss-title">Windows protected your PC</div>
+              <div class="ss-kv"><span>App:</span><span>Texfinity 0.9.52.exe</span><span>Publisher:</span><span>Unknown publisher</span></div>
+              <div class="ss-btns"><span class="go">Run anyway</span><span>Don't run</span></div>
+            </div>
+          </div>
+        </div>
+        <p class="once">You only do this once. After that, Texfinity opens straight away.</p>
+      </section>
+    </div>
+  </section>
+
+  <!-- SHOP -->
+  <section class="page" id="page-shop" data-page="shop">
+    <div class="wrap page-pad">
+      <h1 class="section-title reveal">Shop</h1>
+      <p class="lede reveal">The paint editor is free for everyone. Lifetime unlocks everything else with one payment, and keeps Texfinity being built. Delivered to your account the moment the order clears.</p>
+      <div class="matrix-wrap reveal" id="plans"></div>
+      <p class="shop-note reveal">One payment, yours for good, with every future update. Pay with Ko-fi, then open a ticket on our Discord and we unlock it.</p>
+    </div>
+  </section>
+
+  <!-- CART / CHECKOUT -->
+  <section class="page" id="page-cart" data-page="cart">
+    <div class="wrap page-pad">
+      <h1 class="section-title reveal">Checkout</h1>
+      <p class="lede reveal">Pay with Ko-fi, then open a ticket on our Discord: we unlock Lifetime on your email and give you the Pro role.</p>
+      <div class="cart-grid" style="margin-top:26px">
+        <div class="reveal" id="cartItems"></div>
+        <div class="pay reveal" id="payPanel"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="page" id="page-contact" data-page="contact">
+    <div class="wrap page-pad">
+      <h1 class="section-title reveal">Contact</h1>
+      <p class="lede reveal">Texfinity is made by two people. The fastest way to reach both of us is Discord, where we post builds and answer bugs every day.</p>
+      <a class="jump reveal" href="#answers" data-scroll="answers">Looking for a quick answer? Search below <span aria-hidden="true">↓</span></a>
+      <div class="makers">
+        <div class="maker reveal">
+          <div class="face" aria-hidden="true">E</div>
+          <h3>Efou</h3>
+          <span class="handle">@imefou on TikTok</span>
+          <p>Co-creator of Texfinity. Follow along for new tools, packs and what's coming next.</p>
+          <a class="btn btn-ghost" href="https://www.tiktok.com/@imefou" target="_blank">Follow @imefou</a>
+        </div>
+        <div class="maker reveal">
+          <div class="face" aria-hidden="true">P</div>
+          <h3>Potter</h3>
+          <span class="handle">@2potter2 on TikTok</span>
+          <p>Co-creator of Texfinity. Packs, previews and behind the scenes.</p>
+          <a class="btn btn-ghost" href="https://www.tiktok.com/@2potter2" target="_blank">Follow @2potter2</a>
+        </div>
+        <div class="maker discord reveal">
+          <div class="face" aria-hidden="true"><svg viewBox="0 0 24 24" fill="#fff"><path d="M19.3 5.3A17 17 0 0 0 15 4l-.2.4a15.6 15.6 0 0 1 3.8 1.2 13 13 0 0 0-11.2 0A15.6 15.6 0 0 1 11.2 4.4L11 4a17 17 0 0 0-4.3 1.3C3.7 9.8 2.9 14.2 3.3 18.5a17 17 0 0 0 5.2 2.6l.6-1a11 11 0 0 1-1.8-.9l.4-.3a12 12 0 0 0 10.6 0l.4.3a11 11 0 0 1-1.8.9l.6 1a17 17 0 0 0 5.2-2.6c.5-5-.8-9.3-3.4-13.2ZM9.5 15.6c-.9 0-1.6-.9-1.6-1.9s.7-1.9 1.6-1.9 1.6.9 1.6 1.9-.7 1.9-1.6 1.9Zm5 0c-.9 0-1.6-.9-1.6-1.9s.7-1.9 1.6-1.9 1.6.9 1.6 1.9-.7 1.9-1.6 1.9Z"/></svg></div>
+          <h3>Talk to both of us</h3>
+          <span class="handle">discord.gg/texfinity</span>
+          <p>Bugs, ideas, help with a pack or a payment: ask in the Discord and one of us will answer.</p>
+          <a class="btn btn-primary" href="https://discord.gg/texfinity" target="_blank" data-mag>Join the Discord</a>
+        </div>
+      </div>
+
+      <section class="answers" id="answers" aria-labelledby="ansTitle">
+        <h2 id="ansTitle" class="reveal">Search for an answer</h2>
+        <div class="search reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="faqQ" type="search" placeholder="Try: windows warning, optifine, where are my packs" autocomplete="off" aria-label="Search the answers"></div>
+        <div class="faq reveal" id="faq"></div>
+        <div class="faq-count" id="faqCount"></div>
+      </section>
+
+      <section class="write" aria-labelledby="writeTitle">
+        <div class="reveal">
+          <h2 id="writeTitle">Still stuck?</h2>
+          <p class="lede">Write your message here and it is copied for you, then the Discord opens so you can paste it. Found a bug? In the app, open Settings › Help and copy the bug report: it tells us exactly what happened.</p>
+        </div>
+        <div class="cform reveal">
+          <h3>WRITE TO US</h3>
+          <div class="field"><label for="cName">Your name or Discord</label><input id="cName" placeholder="efou_" autocomplete="off"></div>
+          <div class="field"><label for="cMsg">Message</label><textarea id="cMsg" placeholder="Found a bug, have an idea, want to help out..."></textarea><div class="err" id="cErr"></div></div>
+          <button class="btn btn-primary" id="cCopy" style="width:100%" data-mag>Copy message and open Discord</button>
+          <p class="pay-note">Paste it into our Discord and we will get back to you there.</p>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- PRIVACY -->
+  <section class="page" id="page-privacy" data-page="privacy">
+    <div class="wrap page-pad legal">
+      <h1 class="section-title reveal">Privacy policy</h1>
+      <p class="lede reveal">Last updated 15 November 2026. What Texfinity collects, why, and what you can ask us to do with it. In short: very little, nothing is sold, and your packs never leave your PC.</p>
+      <div class="legal-body reveal">
+        <h2>Who we are</h2>
+        <p>Texfinity is made by Efou and Potter, based in Bulgaria. We are the controller of the personal data described here. Contact us about anything on this page on our Discord: <a href="https://discord.gg/texfinity" target="_blank" rel="noopener">discord.gg/texfinity</a> (open a ticket and say it's a privacy request).</p>
+
+        <h2>The app</h2>
+        <ul>
+          <li><b>Your packs stay on your PC.</b> Textures, sounds, models and settings are saved in Texfinity's folder on your computer. We never receive them.</li>
+          <li><b>No tracking.</b> The app has no analytics, ads or telemetry. Crash notes (crash-log.txt) stay on your PC unless you choose to send us a bug report.</li>
+          <li><b>When you have an account,</b> the app talks to our account server to log you in and check your plan (see below).</li>
+          <li><b>Discord status</b> (optional, off by default) is shared through the Discord app on your PC, under Discord's own privacy policy.</li>
+          <li><b>Plugins</b> you install are made by other people and can contact their own websites. We don't control what they do.</li>
+        </ul>
+
+        <h2>This website</h2>
+        <ul>
+          <li>No analytics, no advertising and no tracking cookies. Fonts and files are served from this site itself.</li>
+          <li>Your basket is kept in your own browser (local storage) and is never sent to us.</li>
+          <li>If you log in here, one strictly necessary cookie keeps you logged in for up to 30 days. It can't be read by the page's scripts and is not used for anything else, so no cookie banner is needed.</li>
+          <li>The site is hosted by GitHub Pages, which records basic technical logs (like IP addresses) to run and protect its service, under GitHub's privacy statement.</li>
+        </ul>
+
+        <h2>Your account</h2>
+        <p>To create an account we store your email address, a scrambled check of your password (never the password itself), your plan, and your active logins (each lasts 30 days). We email you a one-time code each time you log in, through an email delivery service that only uses your address to send it. To slow down attacks we briefly count requests per IP address and per email; these counts are kept in memory for a few minutes and never saved.</p>
+
+        <h2>Buying Lifetime</h2>
+        <p>You pay on Ko-fi, which handles the payment and your payment details under its own privacy policy; we never see your card details. You then open a ticket on our Discord with your order and Ko-fi receipt. To give you Lifetime we keep a license record: the email it's for, your Discord username and ID, a license key and the date. We keep the Pro role on your Discord account while the license is active.</p>
+
+        <h2>Why we use it (legal basis)</h2>
+        <ul>
+          <li>Your account, login codes and license: to provide what you asked for (performance of a contract).</li>
+          <li>Rate limits and security records: to keep accounts and the service safe (our legitimate interest).</li>
+          <li>Purchase records: to meet our legal and accounting obligations.</li>
+        </ul>
+
+        <h2>How long we keep it</h2>
+        <p>Login codes last 10 minutes. Your account is kept until you ask us to delete it. License and purchase records are kept for as long as the license exists and for as long as accounting law requires afterwards.</p>
+
+        <h2>Who else sees it</h2>
+        <p>Only the services that make this work: our server host, the email delivery service, Ko-fi (payments), Discord (tickets and roles) and GitHub (this website). We never sell or share your data for advertising.</p>
+
+        <h2>Your rights</h2>
+        <p>You can ask to see the data we have about you, correct it, delete it, receive a copy, or object to how we use it. Ask on our Discord and we'll answer within one month. You can also complain to the Bulgarian Commission for Personal Data Protection (<a href="https://www.cpdp.bg" target="_blank" rel="noopener">cpdp.bg</a>) or the data protection authority where you live.</p>
+
+        <h2>Children</h2>
+        <p>If you are under 14, ask a parent or guardian before creating an account or buying anything.</p>
+
+        <h2>Changes</h2>
+        <p>If this policy changes, we update this page and the date at the top. Important changes are also announced on our Discord.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TERMS -->
+  <section class="page" id="page-terms" data-page="terms">
+    <div class="wrap page-pad legal">
+      <h1 class="section-title reveal">Terms of use</h1>
+      <p class="lede reveal">Last updated 15 November 2026. The rules for using Texfinity and buying Lifetime.</p>
+      <div class="legal-body reveal">
+        <h2>Who we are</h2>
+        <p>Texfinity is made by Efou and Potter, based in Bulgaria. Contact us on our Discord: <a href="https://discord.gg/texfinity" target="_blank" rel="noopener">discord.gg/texfinity</a>. By downloading Texfinity, creating an account or buying Lifetime you agree to these terms.</p>
+
+        <h2>The free app and Lifetime</h2>
+        <ul>
+          <li>The free version lets you make and export packs and use the paint editor.</li>
+          <li><b>Lifetime</b> is a one-time payment that unlocks the paid features listed on the Shop page, plus future updates, for as long as we offer Texfinity.</li>
+          <li>Lifetime belongs to one person and one Texfinity account (the email it's issued to). You may not share, resell or transfer it.</li>
+          <li>Lifetime needs the app to check your plan with our server now and then; it keeps working offline for up to 14 days, and you log in again every 30 days.</li>
+        </ul>
+
+        <h2>Payment and no refunds</h2>
+        <p><b>All purchases are final. We do not offer refunds.</b></p>
+        <p>Payment is made on Ko-fi. Lifetime is digital content delivered as soon as we unlock it on your account. Before paying, you expressly agree that delivery starts straight away and acknowledge that you lose your right to withdraw from the purchase (the 14-day right in the EU) once Lifetime is unlocked. If a payment is reversed or charged back, the license is removed.</p>
+
+        <h2>Using Texfinity fairly</h2>
+        <ul>
+          <li>Don't crack, modify or get around the paid features, the license checks or the app's protections, and don't help others do so.</li>
+          <li>Don't redistribute, resell or rebrand the Texfinity app. Share the official download link instead.</li>
+          <li>Don't attack or overload our servers, or use someone else's account.</li>
+        </ul>
+        <p>We may remove a license or account that breaks these rules.</p>
+
+        <h2>Your packs</h2>
+        <p>Packs you make with Texfinity are yours. You are responsible for having the rights to anything you put in them, including other people's textures and sounds. Minecraft and its own assets belong to Mojang and Microsoft; Texfinity is not affiliated with or endorsed by them, and you must follow Minecraft's usage guidelines when sharing packs.</p>
+
+        <h2>Plugins</h2>
+        <p>Plugins are made by other people and run with full access to your PC. You install them at your own risk; we are not responsible for what they do.</p>
+
+        <h2>No guarantees</h2>
+        <p>Texfinity is provided as it is. We work hard to keep it reliable, but we can't promise it will be free of bugs or always available, so keep backups of your packs. To the extent the law allows, we are not liable for lost data or indirect damage, and our total liability is limited to what you paid us. Nothing here removes rights you have under consumer law that can't be waived.</p>
+
+        <h2>Law</h2>
+        <p>These terms are governed by the laws of Bulgaria, and disputes go to the courts of Bulgaria, without taking away any mandatory protection that the consumer law of your own country gives you.</p>
+
+        <h2>Changes</h2>
+        <p>We may update these terms. The date at the top shows the latest version, and important changes are announced on our Discord.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACCOUNT -->
+  <section class="page" id="page-account" data-page="account">
+    <div class="wrap page-pad">
+      <h1 class="section-title reveal">Your account</h1>
+      <p class="lede reveal">One account for the app and this site. Log in once and it remembers you for 30 days; then it asks for your password and a fresh code again.</p>
+      <div class="acct-wrap">
+        <div class="acct-why reveal">
+          <div><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p><b>Two steps every time</b><span>Your password, then a 6-digit code we email you. Someone with only your password can't get in.</span></p></div>
+          <div><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><p><b>Remembered for 30 days</b><span>No logging in every visit. After 30 days you log in again, so an old login can't hang around forever.</span></p></div>
+          <div><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg><p><b>Kept away from the page</b><span>Your login is stored where this site's scripts can't read it, and your password is never stored at all, only a scrambled check of it.</span></p></div>
+        </div>
+        <div class="acct-card reveal">
+          <div id="acctOff"><h3>ACCOUNTS</h3><p class="dim" style="margin:0">Accounts open soon. Until then, the app works without one.</p></div>
+          <div id="acctForm" hidden>
+            <div class="acct-tabs" role="tablist"><button type="button" class="on" data-mode="login" role="tab">Log in</button><button type="button" data-mode="register" role="tab">Create account</button></div>
+            <div class="field"><label for="aEmail">Email</label><input id="aEmail" type="email" autocomplete="email" spellcheck="false" maxlength="120"></div>
+            <div class="field"><label for="aPass">Password</label><input id="aPass" type="password" autocomplete="current-password" maxlength="200"><div class="err" id="aErr"></div></div>
+            <button class="btn btn-primary" id="aGo" type="button">Log in</button>
+            <p class="pay-note" id="aNote">We'll email you a code to finish.</p>
+          </div>
+          <div id="acctCode" class="acct-code" hidden>
+            <h3>CHECK YOUR EMAIL</h3>
+            <p class="dim" style="margin:0 0 14px">We sent a 6-digit code to <b id="aCodeTo"></b>. It works for 10 minutes.</p>
+            <div class="field"><label for="aCode">Code</label><input id="aCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6"><div class="err" id="aCodeErr"></div></div>
+            <button class="btn btn-primary" id="aVerify" type="button">Verify</button>
+            <div class="acct-row"><button type="button" id="aBack">Back</button><button type="button" id="aResend">Send a new code</button></div>
+          </div>
+          <div id="acctIn" hidden>
+            <h3>LOGGED IN</h3>
+            <div class="acct-facts">
+              <div><span>Email</span><b id="aMe"></b></div>
+              <div><span>Plan</span><b id="aPlan"></b></div>
+              <div><span>Log in again on</span><b id="aUntil"></b></div>
+            </div>
+            <a class="btn btn-ghost" id="aShop" href="#shop" data-link style="width:100%;margin-bottom:10px">See Lifetime</a>
+            <button class="btn btn-ghost" id="aOut" type="button">Log out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span class="fb"><img src="texfinity-cube-64.png" alt="" width="24" height="24">TEXFINITY</span>
+    <span class="fnote">The endless Minecraft texture pack maker. Made by Efou and Potter. Not affiliated with Mojang or Microsoft.</span>
+    <span class="flinks">
+      <a href="#features" data-link>Features</a>
+      <a href="#download" data-link>Download</a>
+      <a href="https://discord.gg/texfinity" target="_blank">Discord</a>
+      <a href="#privacy" data-link>Privacy</a>
+      <a href="#terms" data-link>Terms</a>
+    </span>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Flip.min.js" integrity="sha384-CHvG5TSBYWY4gs18D+se5IrGOZ6r8JlhAWob7LbkaUcfqD8PWzaYz2pqZdH7LsXQ" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (window.gsap && window.Flip) gsap.registerPlugin(Flip);
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* 3D morphing wireframe */
+function gem(canvas, opts={}) {
+  const ctx = canvas.getContext('2d');
+  const NLON = opts.lon || 26, NLAT = opts.lat || 14, R = opts.r || 1;
+  const interact = opts.interact !== false;
+  let W = 0, H = 0, dpr = 1;
+  function size() { const b = canvas.getBoundingClientRect(); dpr = Math.min(2, window.devicePixelRatio || 1); W = Math.max(1, b.width); H = Math.max(1, b.height); canvas.width = W * dpr; canvas.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+  size();
+  const sp = (t, e) => Math.sign(t) * Math.pow(Math.abs(t), e);
+  function vert(i, j, e1, e2) { const u = -Math.PI + (i / NLON) * 2 * Math.PI; const v = -Math.PI / 2 + (j / NLAT) * Math.PI; const cv = Math.cos(v), sv = Math.sin(v), cu = Math.cos(u), su = Math.sin(u); return [sp(cv, e1) * sp(cu, e2), sp(sv, e1), sp(cv, e1) * sp(su, e2)]; }
+  function rot(p, yaw, pit) { let [x, y, z] = p; const x1 = x * Math.cos(yaw) + z * Math.sin(yaw), z1 = -x * Math.sin(yaw) + z * Math.cos(yaw); const y2 = y * Math.cos(pit) - z1 * Math.sin(pit), z2 = y * Math.sin(pit) + z1 * Math.cos(pit); return [x1, y2, z2]; }
+  let mx = 0, my = 0, tmx = 0, tmy = 0;
+  if (interact) window.addEventListener('pointermove', (e) => { tmx = (e.clientX / innerWidth - .5) * 2; tmy = (e.clientY / innerHeight - .5) * 2; });
+  const t0 = performance.now(); let raf;
+  function frame(now) {
+    raf = requestAnimationFrame(frame);
+    if (!canvas.isConnected) { cancelAnimationFrame(raf); return; }
+    // created on a hidden page it measured 1x1; measure again once it's shown (or resized)
+    if (canvas.clientWidth && (Math.abs(canvas.clientWidth - W) > 1 || Math.abs(canvas.clientHeight - H) > 1)) size();
+    if (!canvas.clientWidth) return;
+    const t = (now - t0) / 1000; mx += (tmx - mx) * .05; my += (tmy - my) * .05;
+    const e1 = 1 + .85 * Math.sin(t * .35), e2 = 1 + .85 * Math.sin(t * .35 + 2.1);
+    const yaw = REDUCE ? .6 : t * .3 + mx * .6, pit = REDUCE ? .4 : .35 + my * .5;
+    ctx.clearRect(0, 0, W, H);
+    const cx = W / 2, cy = H / 2, scale = Math.min(W, H) * .34 * R, cam = 3.4;
+    const P = [];
+    for (let j = 0; j <= NLAT; j++) { P[j] = []; for (let i = 0; i <= NLON; i++) { const p = rot(vert(i, j, e1, e2), yaw, pit); const d = cam - p[2]; P[j][i] = [cx + p[0] * scale * (cam / d), cy - p[1] * scale * (cam / d), p[2]]; } }
+    ctx.lineWidth = 1;
+    const seg = (a, b) => { const depth = (a[2] + b[2]) / 2; const al = Math.max(.05, Math.min(.9, (depth + 1.3) / 2.6)); ctx.strokeStyle = 'rgba(255,255,255,' + al.toFixed(3) + ')'; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); };
+    for (let j = 0; j <= NLAT; j++) for (let i = 0; i < NLON; i++) seg(P[j][i], P[j][i + 1]);
+    for (let i = 0; i <= NLON; i++) for (let j = 0; j < NLAT; j++) seg(P[j][i], P[j + 1][i]);
+  }
+  raf = requestAnimationFrame(frame);
+  window.addEventListener('resize', size);
+}
+// (the wireframe shapes are gone: the cube logo is in the nav, hero and footer)
+
+/* cursor */
+// A white blob that inverts what's under it (stretching as it moves, growing over anything you
+// can click), over a faint dot grid that leans away from it like grass. Mouse only.
+if (!REDUCE && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  const blob = $('.cur-blob'), cv = $('.cur-grid'), g = cv.getContext('2d');
+  const GAP = 28, REACH = 150, PUSH = 16;
+  let W = 0, H = 0, dpr = 1;
+  const size = () => { dpr = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0); drawGrid(); };
+  let tx = -999, ty = -999, bx = -999, by = -999, gx = -999, gy = -999, scale = 1, hot = false, seen = false;
+  function drawGrid() {
+    g.clearRect(0, 0, W, H);
+    for (let y = GAP / 2; y < H; y += GAP) for (let x = GAP / 2; x < W; x += GAP) {
+      const dx = x - gx, dy = y - gy, d = Math.hypot(dx, dy);
+      let px = x, py = y, a = .07;
+      if (d < REACH && d > 0.01) { const f = (1 - d / REACH) ** 2; px += dx / d * f * PUSH; py += dy / d * f * PUSH; a = .07 + f * .38; }
+      g.fillStyle = `rgba(255,255,255,${a})`; g.fillRect(px - 1, py - 1, 2, 2);
+    }
+  }
+  let running = false;
+  function loop() {
+    bx += (tx - bx) * .22; by += (ty - by) * .22;
+    gx += (tx - gx) * .12; gy += (ty - gy) * .12;
+    scale += ((hot ? 1.9 : 1) - scale) * .2;
+    const vx = tx - bx, vy = ty - by, sp = Math.min(.45, Math.hypot(vx, vy) / 90);
+    // 0.36 of its 100px size = the 36px blob; growing over buttons and stretching stay under 1
+    const k = .36;
+    blob.style.transform = `translate(${bx}px, ${by}px) rotate(${Math.atan2(vy, vx)}rad) scale(${k * scale * (1 + sp)}, ${k * scale * (1 - sp * .55)})`;
+    drawGrid();
+    if (Math.abs(tx - bx) + Math.abs(ty - by) + Math.abs(tx - gx) + Math.abs(ty - gy) > .3 || Math.abs((hot ? 1.9 : 1) - scale) > .01) requestAnimationFrame(loop); else running = false;
+  }
+  const kick = () => { if (!running) { running = true; requestAnimationFrame(loop); } };
+  window.addEventListener('pointermove', (e) => {
+    tx = e.clientX; ty = e.clientY;
+    if (!seen) { seen = true; bx = gx = tx; by = gy = ty; document.documentElement.classList.add('blob-on'); }
+    kick();
+  });
+  document.addEventListener('pointerover', (e) => { const h = !!e.target.closest('a,button,[role="button"],.tile,.fcard:not(.hero),summary,label,[data-link]'); if (h !== hot) { hot = h; kick(); } });
+  document.documentElement.addEventListener('pointerleave', () => { document.documentElement.classList.remove('blob-on'); seen = false; tx = ty = gx = gy = -999; drawGrid(); });
+  window.addEventListener('resize', size);
+  size();
+}
+
+/* the hero knot: leans toward the cursor, and hisses and rattles when clicked */
+(() => {
+  const knot = $('#knot'); if (!knot) return;
+  // The video's black becomes see-through: each frame is copied to a canvas with brightness as
+  // opacity, so only the white snakes float over the page.
+  const vid = knot.querySelector('video'), cv = knot.querySelector('canvas'), g = cv.getContext('2d', { willReadFrequently: true });
+  const draw = () => {
+    if (current === 'home' && vid.readyState >= 2 && !document.hidden) {
+      g.drawImage(vid, 0, 0, cv.width, cv.height);
+      const im = g.getImageData(0, 0, cv.width, cv.height), d = im.data;
+      for (let i = 0; i < d.length; i += 4) { const l = d[i] > d[i + 1] ? d[i] : d[i + 1]; d[i + 3] = l; d[i] = d[i + 1] = d[i + 2] = 245; }
+      g.putImageData(im, 0, 0);
+    }
+    if (vid.requestVideoFrameCallback) vid.requestVideoFrameCallback(draw); else requestAnimationFrame(draw);
+  };
+  vid.play?.().catch(() => {});
+  if (vid.requestVideoFrameCallback) vid.requestVideoFrameCallback(draw); else requestAnimationFrame(draw);
+  let tx = 0, ty = 0, x = 0, y = 0, running = false;
+  const frame = () => {
+    x += (tx - x) * .08; y += (ty - y) * .08;
+    knot.style.transform = `translate3d(${x * 18}px, ${y * 12}px, 0) rotateY(${x * 16}deg) rotateX(${-y * 12}deg)`;
+    if (Math.abs(tx - x) > .001 || Math.abs(ty - y) > .001) requestAnimationFrame(frame); else running = false;
+  };
+  if (!REDUCE) window.addEventListener('pointermove', (e) => {
+    if (current !== 'home') return;
+    const r = knot.getBoundingClientRect();
+    tx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (innerWidth / 2)));
+    ty = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (innerHeight / 2)));
+    if (!running) { running = true; requestAnimationFrame(frame); }
+  });
+  // The sound: the recorded hiss, nothing else.
+  let ctx = null;
+  function hiss() {
+    try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); } catch { return; }
+    if (ctx.state === 'suspended') ctx.resume();
+    // only the recorded hiss (snake-hiss.mp3), played as it is
+    if (hissBuf) { const src = ctx.createBufferSource(); src.buffer = hissBuf; src.connect(ctx.destination); src.start(); }
+  }
+  // The recording is loaded once, ahead of time, so the first click hisses straight away.
+  let hissBuf = null, loading = null;
+  const loadHiss = () => loading || (loading = (async () => {
+    try {
+      ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+      const data = await (await fetch('snake-hiss.mp3')).arrayBuffer();
+      hissBuf = await ctx.decodeAudioData(data);
+    } catch { hissBuf = null; }
+  })());
+  knot.addEventListener('pointerenter', () => { loadHiss(); }, { once: true });
+  // No spamming: while the snakes hiss (and a moment after) clicks do nothing.
+  const REST = 2900; // ms: the 2.4 s hiss plus a short pause
+  let restingUntil = 0;
+  const strike = async () => {
+    const t = performance.now();
+    if (t < restingUntil) return;
+    restingUntil = t + REST;
+    knot.classList.add('resting');
+    setTimeout(() => knot.classList.remove('resting'), REST);
+    await loadHiss();
+    hiss();
+    knot.classList.remove('shake'); void knot.offsetWidth; knot.classList.add('shake');
+  };
+  knot.addEventListener('click', strike);
+  knot.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); strike(); } });
+  knot.addEventListener('animationend', () => knot.classList.remove('shake'));
+})();
+
+/* morphing highlight (reserved for future tab groups) */
+function morphHL(group) {
+  const active = group.querySelector('[aria-selected="true"]'); let hl = group.querySelector(':scope > .hl');
+  if (!hl) { hl = document.createElement('span'); hl.className = 'hl'; group.prepend(hl); }
+  if (!active) { hl.style.opacity = 0; return; }
+  const g = group.getBoundingClientRect(), r = active.getBoundingClientRect();
+  const first = !hl.dataset.init; hl.dataset.init = '1';
+  hl.style.transition = (first || REDUCE) ? 'opacity .2s' : 'transform .45s var(--ease), width .45s var(--ease), height .45s var(--ease)';
+  hl.style.opacity = 1; hl.style.transform = `translate(${r.left-g.left}px,${r.top-g.top}px)`; hl.style.width = r.width + 'px'; hl.style.height = r.height + 'px';
+}
+
+/* router */
+const PAGES = ['home','features','download','shop','cart','contact','account','privacy','terms'];
+function routeName(){ const h = (location.hash || '#home').slice(1); return PAGES.includes(h) ? h : 'home'; }
+function movePill(page) {
+  const pill = $('#navPill'), link = $(`.nav-link[data-page="${page}"]`);
+  $$('.nav-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
+  if (!link) { pill.style.opacity = 0; return; }
+  pill.style.opacity = 1; pill.style.transform = `translateX(${link.offsetLeft}px)`; pill.style.width = link.offsetWidth + 'px';
+}
+function revealChildren(page) {
+  const els = $$('.reveal', page);
+  if (REDUCE) { gsap.set(els, { opacity: 1, y: 0, filter: 'none' }); return; }
+  gsap.fromTo(els, { opacity: 0, y: 22, filter: 'blur(8px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .6, stagger: .05, ease: 'power3.out', clearProps: 'filter' });
+}
+let current = 'home';
+function go(page, instant) {
+  const next = $('#page-' + page), cur = $('#page-' + current);
+  movePill(page);
+  if (page === current && next.classList.contains('active')) return;
+  const finish = () => { if (cur && cur !== next) cur.classList.remove('active'); next.classList.add('active'); window.scrollTo(0, 0); revealChildren(next); current = page; if (page === 'features') revealHero($('#bento .fcard.hero')); };
+  if (instant || REDUCE || !window.gsap) { if (cur && cur !== next) cur.classList.remove('active'); next.classList.add('active'); window.scrollTo(0,0); current = page; window.gsap && revealChildren(next); if (page === 'features') revealHero($('#bento .fcard.hero')); return; }
+  const tl = gsap.timeline();
+  if (cur && cur !== next) tl.to(cur, { opacity: 0, y: -16, filter: 'blur(10px)', duration: .28, ease: 'power2.in' });
+  tl.add(finish);
+  tl.fromTo(next, { opacity: 0, y: 18, filter: 'blur(10px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .45, ease: 'power3.out', clearProps: 'filter' });
+}
+function nav() { closeMenu(); go(routeName()); }
+window.addEventListener('hashchange', nav);
+// The highlight under the nav links is measured from the text: measure again once the font is in.
+document.fonts?.ready.then(() => movePill(current));
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a[data-link]'); if (!a) return;
+  const href = a.getAttribute('href') || ''; if (href[0] !== '#') return;
+  e.preventDefault(); const page = href.slice(1);
+  try { if (location.hash !== href) history.replaceState(null, '', href); } catch {}
+  closeMenu(); go(PAGES.includes(page) ? page : 'home');
+});
+
+/* intro */
+function intro() {
+  movePill('home');
+  if (REDUCE || !window.gsap) { revealChildren($('#page-home')); return; }
+  const words = $$('#heroTitle .w'); gsap.set(words, { yPercent: 115 });
+  const tl = gsap.timeline({ delay: .15 });
+  tl.to('.nav', { opacity: 1, duration: .4 }, 0);
+  tl.to(words, { yPercent: 0, duration: .9, stagger: .09, ease: 'power4.out' }, .1);
+  tl.fromTo('.hero-badge', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .5 }, .2);
+  tl.fromTo('.hero-sub, .hero-cta', { opacity: 0, y: 16, filter: 'blur(6px)' }, { opacity: 1, y: 0, filter: 'blur(0)', duration: .6, stagger: .08, clearProps: 'filter' }, .4);
+  tl.fromTo('#knot', { opacity: 0, scale: .9 }, { opacity: 1, scale: 1, duration: 1, ease: 'power2.out', clearProps: 'opacity,scale' }, .2);
+  tl.fromTo('.tile', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .5, stagger: .06, ease: 'power3.out' }, .6);
+}
+
+/* magnetic buttons */
+if (!REDUCE && window.gsap) $$('[data-mag]').forEach(btn => {
+  const qx = gsap.quickTo(btn, 'x', { duration: .4, ease: 'power3' }), qy = gsap.quickTo(btn, 'y', { duration: .4, ease: 'power3' });
+  btn.addEventListener('pointermove', (e) => { const r = btn.getBoundingClientRect(); qx((e.clientX - r.left - r.width/2) * .3); qy((e.clientY - r.top - r.height/2) * .4); });
+  btn.addEventListener('pointerleave', () => { qx(0); qy(0); });
+});
+
+/* toast */
+/* accounts: the same server as the app. The login is a cookie this page's scripts can't read
+   (HttpOnly), so nothing here ever holds a password or a token after sending it. */
+// Your hosted account server (https) goes here once it's live. Empty: accounts stay hidden.
+const AUTH_API = ['localhost', '127.0.0.1'].includes(location.hostname) ? 'http://localhost:8787' : '';
+const acct = { email: '', plan: 'free', expires: 0, mode: 'login', codeEmail: '' };
+async function authCall(path, body) {
+  const r = await fetch(AUTH_API + path, { method: 'POST', credentials: 'include', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body || {}) });
+  const d = await r.json().catch(() => ({}));
+  return { ok: r.ok, status: r.status, d };
+}
+function acctShow(which) { for (const id of ['acctOff', 'acctForm', 'acctCode', 'acctIn']) $('#' + id).hidden = id !== which; }
+function acctRender() {
+  const btn = $('#acctBtn');
+  btn.classList.toggle('hidden', !AUTH_API);
+  btn.classList.toggle('in', !!acct.email);
+  btn.setAttribute('aria-label', acct.email ? 'Your account (logged in)' : 'Log in');
+  $('#acctMob').hidden = !AUTH_API;
+  if (!AUTH_API) return acctShow('acctOff');
+  if (!acct.email) return acctShow('acctForm');
+  $('#aMe').textContent = acct.email;
+  $('#aPlan').textContent = acct.plan === 'pro' ? 'Lifetime' : 'Free';
+  $('#aUntil').textContent = acct.expires ? new Date(acct.expires).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
+  $('#aShop').hidden = acct.plan === 'pro';
+  acctShow('acctIn');
+}
+function acctSet(d) { acct.email = d.email || ''; acct.plan = d.plan === 'pro' ? 'pro' : 'free'; acct.expires = Number(d.expires) || 0; acctRender(); }
+async function acctCheck() {
+  if (AUTH_API) { try { const r = await authCall('/verify'); if (r.ok) acctSet(r.d); else acctSet({}); } catch { acctSet({}); } }
+  acctRender();
+}
+for (const b of $$('.acct-tabs button')) b.addEventListener('click', () => {
+  acct.mode = b.dataset.mode;
+  $$('.acct-tabs button').forEach((x) => x.classList.toggle('on', x === b));
+  $('#aGo').textContent = acct.mode === 'register' ? 'Create account' : 'Log in';
+  $('#aPass').autocomplete = acct.mode === 'register' ? 'new-password' : 'current-password';
+  $('#aNote').textContent = acct.mode === 'register' ? 'New accounts start on Free. We\'ll email you a code to finish.' : "We'll email you a code to finish.";
+  $('#aErr').textContent = '';
+});
+async function acctSubmit() {
+  const email = $('#aEmail').value.trim(), pw = $('#aPass').value, err = $('#aErr'), go = $('#aGo');
+  err.textContent = '';
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = 'Enter a valid email.'; return; }
+  if (pw.length < 8) { err.textContent = 'Use a password of at least 8 characters.'; return; }
+  go.disabled = true;
+  try {
+    const r = await authCall(acct.mode === 'register' ? '/register' : '/login', { email, password: pw });
+    if (!r.ok) { err.textContent = r.d.error || 'That didn\'t work. Try again.'; return; }
+    $('#aPass').value = ''; // not kept anywhere
+    acct.codeEmail = r.d.email || email;
+    $('#aCodeTo').textContent = acct.codeEmail; $('#aCode').value = ''; $('#aCodeErr').textContent = '';
+    acctShow('acctCode'); $('#aCode').focus();
+  } catch { err.textContent = "Couldn't reach the account server. Try again in a moment."; }
+  finally { go.disabled = false; }
+}
+async function acctVerify() {
+  const code = $('#aCode').value, err = $('#aCodeErr'), go = $('#aVerify');
+  if (!/^\d{6}$/.test(code)) { err.textContent = 'Enter the 6-digit code.'; return; }
+  go.disabled = true;
+  try {
+    const r = await authCall('/verify-2fa', { email: acct.codeEmail, code });
+    if (!r.ok) { err.textContent = r.d.error || 'That code didn\'t work.'; return; }
+    acctSet(r.d); toast('Logged in for 30 days');
+  } catch { err.textContent = "Couldn't reach the account server."; }
+  finally { go.disabled = false; }
+}
+$('#aGo').addEventListener('click', acctSubmit);
+$('#aPass').addEventListener('keydown', (e) => { if (e.key === 'Enter') acctSubmit(); });
+$('#aCode').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6); $('#aCodeErr').textContent = ''; });
+$('#aCode').addEventListener('keydown', (e) => { if (e.key === 'Enter') acctVerify(); });
+$('#aVerify').addEventListener('click', acctVerify);
+$('#aBack').addEventListener('click', () => acctShow('acctForm'));
+$('#aResend').addEventListener('click', async () => {
+  try { const r = await authCall('/resend-2fa', { email: acct.codeEmail }); $('#aCodeErr').textContent = r.ok ? '' : (r.d.error || ''); if (r.ok) toast('New code sent'); } catch { $('#aCodeErr').textContent = "Couldn't reach the account server."; }
+});
+$('#aOut').addEventListener('click', async () => { try { await authCall('/logout'); } catch {} acctSet({}); toast('Logged out'); });
+acctCheck();
+
+let toastT; function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200); }
+
+/* ===== data ===== */
+const FEATURES = [
+  { k:'paint', name:'Paint editor', img:'feat-fx.jpg', pos:'50% 40%', tag:'Free · effects with Lifetime', d:'A pixel editor built for packs: a pro tool rail with one brush size, live effects you drag into place, change-color that keeps the shading, and per-layer adjustments.',
+    long:'The heart of Texfinity: a pixel editor made for Minecraft textures. Paint with layers and masks, recolour without losing the shading, drop in any of 130 animated effects, and watch the item or block update in 3D as you go.',
+    more:['Layers with masks, opacity and colour adjustments', '130 effects with a live preview (Lifetime)', 'Animated textures, with the .mcmeta written for you', 'Unsaved work comes back if the app closes'] },
+  { k:'model', name:'3D model editor', img:'feat-model.jpg', pos:'30% 45%', tag:'Lifetime', d:'Build custom item and block models, grow and paint cubes straight on the model, and start from any vanilla model.',
+    long:'Turn flat items into real 3D models. Start from the item as it is in the game, shape it cube by cube, and paint straight onto the model. Texfinity saves it where Minecraft looks for it, so it works without mods.',
+    more:['Start from the game’s item or one empty cube', 'Flat items become cubes, one per row of pixels', 'Paint straight onto the model', 'Works in plain Minecraft, no mods'] },
+  { k:'sky', name:'Skybox generator', img:'feat-sky.jpg', pos:'55% 20%', tag:'Lifetime', d:'Over 100 animated skies, a mix-and-match builder, custom clouds, and fantasy and space sets.',
+    long:'Make a custom sky in a few clicks. Pick from over 100 animated skies, mix in stars, auroras, nebulas and planets, or use your own picture or video clip, and look around it in a live 3D preview.',
+    more:['Over 100 animated skies to start from', 'Stars, auroras, nebulas, clouds and planets', 'Your own picture or video as the sky', 'OptiFine, or Skyboxify and Animatica on Fabric'] },
+  { k:'plugins', name:'Plugins', img:'feat-plugins.jpg', pos:'50% 85%', tag:'Lifetime', d:'Python add-ons that bring new tools, buttons and paint effects. Install one from a file.',
+    long:'Add your own tools to Texfinity. Plugins are small Python programs that add buttons, pack-wide tools and new paint effects, and you install one from a single file.',
+    more:['New buttons, pack tools and paint effects', 'Install from a .zip or .py file', 'Anyone can write one in Python', 'Only install plugins from people you trust'] },
+  { k:'upscale', name:'Upscale', img:'feat-upscale.jpg', pos:'50% 45%', tag:'Lifetime', d:'Take a 16x texture to any resolution, pixel for pixel, so it looks the same with room for finer detail.',
+    long:'Take a 16x pack to 32x, 64x or higher in one go. Every pixel becomes a crisp block of pixels, so the pack looks exactly the same in game, with room to add finer detail.',
+    more:['2x, 4x, 8x, 16x or 32x', 'Every pixel kept crisp', 'Keep the original as a copy if you like', 'One texture or the whole pack'] },
+  { k:'showcase', name:'Showcase', img:'feat-showcase.jpg', pos:'60% 30%', tag:'Lifetime', d:'Line your packs up side by side on a board and export it as a PNG, a GIF or a video to share.',
+    long:'Show off your packs side by side. Line them up on a board, swap any cell for a different texture, and save it as a PNG, a GIF or a video ready for TikTok or Discord.',
+    more:['Several packs on one board', 'Swap any cell for another texture', 'PNG, GIF or video', 'Drop in .zip packs or whole folders'] },
+  { k:'themes', name:'Themes', img:'feat-themes.jpg', pos:'50% 15%', tag:'Make it yours', d:'Recolor the whole app, set a picture, GIF or looping video as the background, and tune every animation.',
+    long:'Make Texfinity look the way you like. Pick a theme and an accent colour, set a picture, GIF or looping video as the background, and choose how windows and text animate.',
+    more:['Dark, Darker, Midnight, Warm, Light or your own', 'Picture, GIF or video backgrounds with glass blur', 'Choose how windows and text animate', 'Presets: Default, Calm, Showy, Performance'] },
+  { k:'sound', name:'Sound editor', img:'feat-sound.jpg', pos:'40% 20%', tag:'Lifetime', d:'Trim, mix and add effects to your pack’s sounds, record from a mic, and play them the way the game would.',
+    long:'Edit your pack’s sounds without leaving the app. Arrange clips on tracks, add effects like echo, cave or 8-bit, record from your microphone, and hear them the way Minecraft plays them.',
+    more:['Tracks and clips on a timeline', 'Echo, cave, 8-bit, underwater, radio and more', 'Record from your microphone', 'Play like in game, with random pitch'] },
+];
+const FICON = {
+  paint:'<path d="M12 19l7-7-4-4-7 7v4zM15 6l3 3"/>', model:'<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/>',
+  sky:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2"/>', plugins:'<path d="M9 3v4M15 3v4M7 7h10v4a5 5 0 0 1-10 0z"/><path d="M12 16v5"/>',
+  upscale:'<path d="M4 9V4h5M20 15v5h-5"/><rect x="8" y="8" width="8" height="8" rx="1"/>', showcase:'<rect x="3" y="4" width="18" height="14" rx="1"/><path d="M8 21h8"/>',
+  themes:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18 4.5 4.5 0 0 0 0-9 4.5 4.5 0 0 1 0-9z"/>', sound:'<path d="M4 10v4h4l5 4V6l-5 4H4z"/><path d="M17 8a5 5 0 0 1 0 8"/>',
+};
+const PLANS = [
+  { id:'lifetime', name:'LIFETIME', tier:'ONE PAYMENT', price:24.99, unit:'once', popular:false },
+];
+
+/* features: the big card is a stage. Clicking another feature swaps the two: their text fades,
+   two plain card shells glide between the slots (nothing reflows mid-move), then the real cards
+   come back and the stage's description is revealed word by word. */
+function crestSVG(dark) { const fill = dark ? 'rgba(255,255,255,.14)' : 'rgba(255,255,255,.08)'; return `<svg viewBox="0 0 100 100" fill="none"><path d="M50 6 L86 24 V54 C86 76 70 90 50 96 C30 90 14 76 14 54 V24 Z" stroke="rgba(255,255,255,.3)" stroke-width="2" fill="${fill}"/><path d="M50 26 L62 50 L50 74 L38 50 Z" stroke="rgba(255,255,255,.5)" stroke-width="2"/></svg>`; }
+let featOrder = FEATURES.map((f) => f.k);
+let swapping = false;
+const words = (s) => s.split(/(\s+)/).map((w) => (/^\s+$/.test(w) ? w : `<span class="w">${w}</span>`)).join('');
+function featCard(f) {
+  const d = document.createElement('div');
+  d.className = 'fcard';
+  d.dataset.k = f.k;
+  d.setAttribute('role', 'button'); d.tabIndex = 0;
+  d.innerHTML = `<div class="shot"><img src="${f.img}" alt="Texfinity's ${f.name.toLowerCase()}" style="object-position:${f.pos}" loading="lazy"></div>
+    <span class="open-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
+    <div class="lbl"><div class="head"><div class="fi"><svg viewBox="0 0 24 24">${FICON[f.k]}</svg></div><h3>${f.name}</h3></div>
+    <p class="short">${f.d}</p><p class="long">${words(f.long)}</p>
+    <ul class="more">${f.more.map((m) => `<li>${m.replace(/</g, '&lt;')}</li>`).join('')}</ul><span class="tag">${f.tag}</span></div>`;
+  return d;
+}
+function layoutBento() {
+  featOrder.forEach((k, i) => {
+    const c = $(`#bento .fcard[data-k="${k}"]`);
+    const f = FEATURES.find((x) => x.k === k);
+    c.classList.remove('hero', 's1', 's2', 's3', 's4', 's5', 's6', 's7');
+    c.classList.add(i === 0 ? 'hero' : 's' + i);
+    c.setAttribute('aria-expanded', String(i === 0));
+    c.setAttribute('aria-label', i === 0 ? f.name : 'Show ' + f.name);
+    $('#bento').appendChild(c);
+  });
+}
+function renderBento() {
+  const box = $('#bento'); box.innerHTML = '';
+  FEATURES.forEach((f) => box.appendChild(featCard(f)));
+  layoutBento();
+}
+function revealHero(hero) {
+  if (REDUCE || !window.gsap) return;
+  // the screenshot glides up out of a soft blur, then keeps a slow drift while it's on the stage
+  const shot = hero.querySelector('.shot'), img = shot && shot.querySelector('img');
+  if (shot) gsap.fromTo(shot, { opacity: 0, y: 28, filter: 'blur(10px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .5, ease: 'power3.out', clearProps: 'opacity,transform,filter' });
+  if (img) { gsap.killTweensOf(img); gsap.fromTo(img, { scale: 1.12, xPercent: -2 }, { scale: 1.03, xPercent: 0, duration: .9, ease: 'power3.out', onComplete: () => gsap.to(img, { scale: 1.07, xPercent: 1.5, duration: 9, ease: 'sine.inOut', yoyo: true, repeat: -1 }) }); }
+  gsap.fromTo(hero.querySelectorAll('.head, .tag'), { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .22, ease: 'power3.out', clearProps: 'all' });
+  gsap.fromTo(hero.querySelectorAll('.long .w'), { opacity: 0, y: 6, filter: 'blur(6px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .26, stagger: .006, ease: 'power2.out', clearProps: 'all' });
+  gsap.fromTo(hero.querySelectorAll('.more li'), { opacity: 0, x: -8 }, { opacity: 1, x: 0, duration: .22, stagger: .03, delay: .12, ease: 'power3.out', clearProps: 'all' });
+}
+function showFeature(k) {
+  const i = featOrder.indexOf(k);
+  if (i <= 0 || swapping) return;
+  const bento = $('#bento');
+  const a = bento.querySelector('.fcard.hero'), b = bento.querySelector(`.fcard[data-k="${k}"]`);
+  const swap = () => { [featOrder[0], featOrder[i]] = [featOrder[i], featOrder[0]]; layoutBento(); };
+  if (REDUCE || !window.gsap) { swap(); return; }
+  swapping = true;
+  // Positions inside the grid, measured fresh every time (the page may have scrolled).
+  const rel = (el) => { const box = bento.getBoundingClientRect(), r = el.getBoundingClientRect(); return { left: r.left - box.left, top: r.top - box.top, width: r.width, height: r.height }; };
+  const fly = () => {
+    const fromA = rel(a), fromB = rel(b);
+    // 1. the two cards' contents fade out
+    gsap.to([a.querySelector('.lbl'), a.querySelector('.shot'), b.querySelector('.lbl')], { opacity: 0, duration: .1, ease: 'power1.in', onComplete: () => {
+      // 2. two shells take their place, each carrying its feature's icon and name, so you can see
+      //    which one is going where; the real cards swap underneath, out of sight
+      const ghost = (r, card) => {
+        const g = document.createElement('div'); g.className = 'fghost';
+        const head = card.querySelector('.head').cloneNode(true); head.classList.add('fghost-head'); g.appendChild(head);
+        Object.assign(g.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+        bento.appendChild(g); return g;
+      };
+      const gA = ghost(fromA, a), gB = ghost(fromB, b);
+      for (const c of [a, b]) { c.classList.add('swapping'); gsap.set([c.querySelector('.lbl'), c.querySelector('.shot')], { clearProps: 'opacity' }); }
+      swap();
+      const toA = rel(a), toB = rel(b);
+      const D = .42, E = 'power3.inOut';
+      const tl = gsap.timeline({ onComplete: () => {
+        // 3. the real cards come back under the shells, and the shells fade away (no cut)
+        a.classList.remove('swapping'); b.classList.remove('swapping');
+        gsap.fromTo(a.querySelector('.lbl'), { opacity: 0 }, { opacity: 1, duration: .2, clearProps: 'opacity' });
+        revealHero(b);
+        gsap.to([gA, gB], { opacity: 0, duration: .15, ease: 'power1.out', onComplete: () => { gA.remove(); gB.remove(); swapping = false; } });
+      } });
+      tl.to(gA, { left: toA.left, top: toA.top, width: toA.width, height: toA.height, duration: D, ease: E }, 0);
+      tl.to(gB, { left: toB.left, top: toB.top, width: toB.width, height: toB.height, duration: D, ease: E }, 0);
+      tl.fromTo(gB, { boxShadow: '0 0 0 rgba(0,0,0,0)' }, { boxShadow: '0 30px 80px rgba(0,0,0,.55)', duration: D / 2, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 0);
+    } });
+  };
+  // Scroll first (if the big card is off screen), then fly, so the two movements don't cancel out.
+  const top = bento.getBoundingClientRect().top;
+  if (top < 70 || top > innerHeight * .6) {
+    const target = Math.max(0, window.scrollY + top - 90);
+    let done = false;
+    const go = () => { if (done) return; done = true; window.removeEventListener('scrollend', go); fly(); };
+    window.addEventListener('scrollend', go);
+    setTimeout(go, 450);
+    window.scrollTo({ top: target, behavior: 'smooth' });
+  } else fly();
+}
+document.addEventListener('click', (e) => { const c = e.target.closest('#bento .fcard'); if (c && !c.classList.contains('hero')) showFeature(c.dataset.k); });
+document.addEventListener('keydown', (e) => { const c = e.target.closest && e.target.closest('#bento .fcard'); if (c && (e.key === 'Enter' || e.key === ' ') && !c.classList.contains('hero')) { e.preventDefault(); const k = c.dataset.k; showFeature(k); setTimeout(() => $(`#bento .fcard[data-k="${k}"]`)?.focus(), 800); } });
+
+/* shop + cart */
+let cart = []; try { cart = JSON.parse(localStorage.getItem('tf_cart') || '[]'); } catch {}
+cart = Array.isArray(cart) ? cart.filter((c) => PLANS.some((p) => p.id === c.id)) : []; // plans that no longer exist drop out
+function saveCart() { try { localStorage.setItem('tf_cart', JSON.stringify(cart)); } catch {} }
+function renderPlans() {
+  // Free vs Lifetime: the free app is the paint editor and making packs; Lifetime unlocks the rest.
+  const box = $('#plans');
+  const yes = '<span class="yes" aria-label="Included"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></span>';
+  const no = '<span class="no" aria-label="Not included">–</span>';
+  const ROWS = [
+    ['g', 'FREE FOR EVERYONE'],
+    ['Make and export packs', 'Any Minecraft Java version, saved as a .zip', 1, 1],
+    ['Paint editor', 'Layers, masks, colours, animation frames', 1, 1],
+    ['g', 'LIFETIME UNLOCKS'],
+    ['Paint effects', '130 animated effects with a live preview', 0, 1],
+    ['Block details', 'Random variants for any block', 0, 1],
+    ['Totem pop colours', '', 0, 1],
+    ['Sound editor', '', 0, 1],
+    ['3D model editor', '', 0, 1],
+    ['Skybox generator', 'Over 100 animated skies', 0, 1],
+    ['Plugins', '', 0, 1],
+    ['Upscale', '16x to any resolution', 0, 1],
+    ['Showcase', 'Boards as PNG, GIF or video', 0, 1],
+    ['Bedrock import and export', '', 0, 1],
+    ['Linked folders', 'Work on a pack straight in your own folder', 0, 1],
+    ['g', 'EXTRAS'],
+    ['Every future update', '', 0, 1],
+    ['Your name in the credits', '', 0, 1],
+  ];
+  const head = (pl) => {
+    const inCart = cart.some((c) => c.id === pl.id);
+    return `<div class="mh col-pro"><span class="tier">${pl.tier}</span><h3>${pl.name}</h3><div class="price">£${pl.price.toFixed(2)} <span>${pl.unit}</span></div><button class="btn btn-primary" data-add="${pl.id}">${inCart ? 'In cart' : 'Add to cart'}</button></div>`;
+  };
+  let html = `<div class="mh"></div><div class="mh"><span class="tier">FREE</span><h3>FREE</h3><div class="price">£0</div><a class="btn btn-ghost" href="#download" data-link>Download</a></div>${PLANS.map(head).join('')}`;
+  for (const r of ROWS) {
+    if (r[0] === 'g') { html += `<div class="group">${r[1]}</div>`; continue; }
+    html += `<div class="feat">${r[0]}${r[1] ? `<small>${r[1]}</small>` : ''}</div><div>${r[2] ? yes : no}</div><div class="col-pro">${r[3] ? yes : no}</div>`;
+  }
+  box.innerHTML = `<div class="matrix" role="table" aria-label="What Free and Lifetime include">${html}</div>`;
+}
+function addToCart(id) {
+  if (cart.some(c => c.id === id)) { location.hash = '#cart'; return; }
+  const pl = PLANS.find(p => p.id === id); cart = [{ id: pl.id, name: pl.name, price: pl.price, unit: pl.unit }]; // one plan at a time
+  saveCart(); updateCartCount(); renderPlans(); renderCart(); toast(pl.name + ' added');
+}
+document.addEventListener('click', (e) => { const a = e.target.closest('[data-add]'); if (a) addToCart(a.dataset.add); });
+function updateCartCount() { const c = $('#cartCount'); c.textContent = cart.length; c.classList.toggle('show', cart.length > 0); if (!REDUCE && window.gsap && cart.length) gsap.fromTo(c, { scale: 1.6 }, { scale: 1, duration: .4, ease: 'back.out(3)' }); }
+function money(n) { return '£' + n.toFixed(2); }
+let checkoutStage = 'details';
+function renderCart() {
+  const items = $('#cartItems'), pay = $('#payPanel');
+  if (!cart.length) {
+    items.innerHTML = `<div class="empty"><b>Your cart is empty</b><p class="dim" style="margin:8px 0 18px">Get Lifetime to unlock everything.</p><a class="btn btn-ghost" href="#shop" data-link data-mag>Open the shop</a></div>`;
+    pay.innerHTML = `<h3>SUMMARY</h3><div class="subtotal"><span class="dim">Total</span><b class="mono">£0.00</b></div><button class="btn btn-primary" style="width:100%" disabled>Checkout</button>`;
+    return;
+  }
+  items.innerHTML = cart.map(c => `<div class="cart-item"><div class="ci-crest">${crestSVG(true)}</div><div><div class="ci-name">${c.name}</div><div class="ci-sub">Texfinity Lifetime · ${c.unit.replace('/ ','').trim()}</div></div><div class="ci-price mono">${money(c.price)}</div><button class="ci-rm" data-rm="${c.id}">Remove</button></div>`).join('');
+  const total = cart.reduce((s, c) => s + c.price, 0);
+  if (checkoutStage === 'paid') {
+    // After Pay with Ko-fi: what to do next (Lifetime is unlocked by hand from a Discord ticket).
+    pay.innerHTML = `<h3>NEXT STEPS</h3>
+      <ol class="steps-list">
+        <li><b>Finish paying on Ko-fi</b><span>In the tab that just opened. Didn't open? <button type="button" class="linkish" id="kofiAgain">Open Ko-fi again</button></span></li>
+        <li><b>Join our Discord and open a ticket</b><span>Say you bought Lifetime.</span></li>
+        <li><b>Paste your order in the ticket</b><span>It's copied for you, with the email below. Add your Ko-fi receipt and we'll unlock Lifetime on that email and give you the Pro role.</span></li>
+      </ol>
+      <div class="deliver"><span class="ava">${esc((payEmail[0] || 'T').toUpperCase())}</span><div><div class="dim" style="font-size:11px">LIFETIME FOR</div><b>${esc(payEmail)}</b></div></div>
+      <a class="btn btn-primary" style="width:100%" href="${DISCORD_URL}" target="_blank" rel="noopener" data-mag>Join the Discord and open a ticket</a>
+      <div class="acct-row"><button type="button" id="copyOrder">Copy my order again</button><button type="button" id="newOrder">Start over</button></div>`;
+    return;
+  }
+  pay.innerHTML = `<h3>CHECKOUT</h3>
+    <div class="field"><label for="tfUser">Email for your Lifetime license</label><input id="tfUser" type="email" placeholder="you@example.com" autocomplete="email" spellcheck="false" value="${esc(payEmail)}"><div class="err" id="userErr"></div></div>
+    <div class="subtotal" style="margin-top:4px"><span class="dim">Total</span><b class="mono">${money(total)}</b></div>
+    <button class="btn btn-primary" style="width:100%" id="payBtn" data-mag>Pay with Ko-fi · ${money(total)}</button>
+    <p class="pay-note">Use the email you log in to Texfinity with. You pay on Ko-fi's own page; nothing is charged on this site.</p>`;
+}
+document.addEventListener('click', (e) => {
+  const rm = e.target.closest('[data-rm]');
+  if (rm) { cart = cart.filter(c => c.id !== rm.dataset.rm); saveCart(); updateCartCount(); renderPlans(); renderCart(); return; }
+  if (e.target.id === 'newOrder') { checkoutStage = 'details'; renderCart(); return; }
+  if (e.target.id === 'payBtn') handlePay();
+  if (e.target.id === 'kofiAgain') window.open(KOFI_URL, '_blank', 'noopener');
+  if (e.target.id === 'copyOrder') { copyOrder(); toast('Order copied: paste it in your ticket'); }
+  if (e.target.id === 'cCopy') copyContact();
+});
+document.addEventListener('input', (e) => {
+  if (e.target.id === 'tfUser') { payEmail = e.target.value.trim(); $('#userErr').textContent = ''; }
+  if (e.target.id === 'cMsg' || e.target.id === 'cName') $('#cErr').textContent = '';
+});
+// Payments: Ko-fi for the money, then a Discord ticket where Lifetime is unlocked with the bot.
+const KOFI_URL = 'https://ko-fi.com/texfinity';
+const DISCORD_URL = 'https://discord.gg/texfinity';
+let payEmail = '';
+function orderText() {
+  const total = cart.reduce((n, c) => n + c.price, 0);
+  return `Texfinity Lifetime order\nEmail for the license: ${payEmail}\nItems: ${cart.map((c) => c.name).join(', ')}\nTotal: ${money(total)}\nPaid with Ko-fi (receipt attached)`;
+}
+function copyOrder() { try { navigator.clipboard?.writeText(orderText()); } catch {} }
+function handlePay() {
+  payEmail = $('#tfUser').value.trim();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(payEmail)) { $('#userErr').textContent = 'Enter the email you use (or will use) to log in to Texfinity.'; return; }
+  showKofiSteps();
+}
+// Before Ko-fi opens: every step in one popup, so nobody pays and then wonders what's next.
+// "Understood" copies the order, opens Ko-fi and switches the cart to the next steps.
+function showKofiSteps() {
+  closeKofiSteps();
+  const wrap = document.createElement('div');
+  wrap.className = 'kofi-modal';
+  wrap.innerHTML = `<div class="kofi-box" role="dialog" aria-modal="true" aria-labelledby="kofiTitle">
+      <h2 id="kofiTitle">How paying works</h2>
+      <ol class="steps-list">
+        <li><b>Pay on Ko-fi</b><span>Ko-fi opens in a new tab. Pay for Lifetime there; nothing is charged on this site.</span></li>
+        <li><b>Join our Discord</b><span>Use the button that appears in your basket, or discord.gg/texfinity.</span></li>
+        <li><b>Open a ticket</b><span>Say you bought Lifetime.</span></li>
+        <li><b>Paste your order and your Ko-fi receipt</b><span>Your order is copied for you when you press Understood. It includes your email: <b class="kofi-email"></b></span></li>
+        <li><b>We unlock Lifetime</b><span>On that email, plus the Pro role on Discord. Log in to Texfinity with the same email.</span></li>
+      </ol>
+      <label class="kofi-agree"><input type="checkbox" id="kofiAgree"><span>I agree to the <a href="#terms" data-link>Terms</a>. I want Lifetime delivered as soon as it's unlocked and understand that I then lose my right to withdraw: <b>all sales are final, no refunds.</b></span></label>
+      <div class="kofi-actions"><button type="button" class="btn btn-ghost" id="kofiCancel">Cancel</button><button type="button" class="btn btn-primary" id="kofiOk" disabled>Understood</button></div>
+    </div>`;
+  wrap.querySelector('.kofi-email').textContent = payEmail;
+  document.body.appendChild(wrap);
+  document.documentElement.style.overflow = 'hidden';
+  const box = wrap.querySelector('.kofi-box');
+  if (!REDUCE && window.gsap) { gsap.fromTo(wrap, { opacity: 0 }, { opacity: 1, duration: .2 }); gsap.fromTo(box, { y: 18, scale: .97 }, { y: 0, scale: 1, duration: .35, ease: 'power3.out' }); }
+  const okBtn = wrap.querySelector('#kofiOk');
+  wrap.querySelector('#kofiAgree').addEventListener('change', (e) => { okBtn.disabled = !e.target.checked; });
+  wrap.querySelector('a[href="#terms"]').addEventListener('click', () => closeKofiSteps());
+  wrap.querySelector('#kofiAgree').focus();
+  wrap.addEventListener('click', (e) => { if (e.target === wrap || e.target.id === 'kofiCancel') closeKofiSteps(); });
+  okBtn.addEventListener('click', () => {
+    if (!wrap.querySelector('#kofiAgree').checked) return;
+    copyOrder();
+    window.open(KOFI_URL, '_blank', 'noopener');
+    closeKofiSteps();
+    checkoutStage = 'paid';
+    renderCart();
+    if (!REDUCE && window.gsap) gsap.fromTo('#payPanel > *', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .35, stagger: .05, ease: 'power3.out', clearProps: 'all' });
+  });
+  wrap.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeKofiSteps();
+    if (e.key === 'Tab') { // keep focus on the two buttons
+      const b = [...wrap.querySelectorAll('button:not(:disabled), input, a')]; const i = b.indexOf(document.activeElement);
+      e.preventDefault(); b[(i + (e.shiftKey ? b.length - 1 : 1)) % b.length].focus();
+    }
+  });
+}
+function closeKofiSteps() {
+  const m = document.querySelector('.kofi-modal');
+  if (!m) return;
+  m.remove();
+  document.documentElement.style.overflow = '';
+  $('#payBtn')?.focus();
+}
+
+/* contact copy */
+async function copyContact() {
+  const name = $('#cName').value.trim(), msg = $('#cMsg').value.trim();
+  if (msg.length < 4) { $('#cErr').textContent = 'Write a short message first.'; return; }
+  const text = `From: ${name || 'someone'}\n${msg}`;
+  try { await navigator.clipboard.writeText(text); toast('Message copied'); } catch { toast('Select the text and copy it'); }
+  setTimeout(() => window.open('https://discord.gg/texfinity', '_blank'), 400);
+}
+
+
+/* contact: answers you can search */
+const FAQ = [
+  ['Is Texfinity free?', 'The paint editor is free, and so is making and exporting packs. Lifetime, one payment, unlocks everything else: paint effects, block details, totem pop colours, the sound editor, the 3D model editor, the skybox generator, plugins, Upscale, Showcase, Bedrock import and export, and linked folders.'],
+  ['Which Minecraft versions does it make packs for?', 'Minecraft Java Edition, from 1.6 up to the latest releases. You pick the version when you make a pack, and you can change it later.'],
+  ['Why does Windows warn me when I open it?', 'Texfinity is new and not signed with a paid certificate yet, so SmartScreen may stop it the first time. Click "More info", then "Run anyway". The Download page shows the two screens.'],
+  ['How do I know my download is the real Texfinity?', 'Only download it from texfinity.app or our Discord. The Download page shows the SHA-256 checksum of the current version: in PowerShell, run Get-FileHash on the file and check it matches exactly. If it does not, delete it and tell us.'],
+  ['Does it work on Mac or Linux?', 'Not yet. Texfinity is Windows only for now. Ask for it on Discord to hear first when that changes.'],
+  ['Where are my packs saved?', 'In Texfinity’s own folder on your PC. Click Folders on the home screen to open it. Packs you link from another folder stay where they are.'],
+  ['How do I get my pack into Minecraft?', 'Click Export. The first time you pick your resourcepacks folder; after that, Export saves the .zip straight there and replaces the old one. Test in game reloads Minecraft’s packs for you (F3+T).'],
+  ['Do I need OptiFine?', 'Most things work in plain Minecraft. Custom skies, textures that change by height and some block details need OptiFine, or on Fabric: Skyboxify and Animatica for skies, Continuity for the rest.'],
+  ['How do I get Lifetime after paying?', 'Put Lifetime in your basket and press Pay with Ko-fi. After paying, join our Discord and open a ticket: paste your order (it is copied for you) and your Ko-fi receipt, and we unlock Lifetime on your email and give you the Pro role.'],
+  ['Can I get a refund?', 'No. All purchases are final: Lifetime is delivered as soon as it is unlocked, and you agree to that before paying. See the Terms page.'],
+  ['Are plugins safe?', 'Plugins are Python programs, so they can do anything a program on your PC can. Only install plugins from people you trust.'],
+  ['I found a bug. What should I send?', 'In the app, open Settings › Help and copy the bug report. Paste it in our Discord and say what you were doing. It includes the version and the recent errors, so we can fix it faster.'],
+];
+const escHTML = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+function renderFaq() {
+  const q = ($('#faqQ')?.value || '').trim().toLowerCase();
+  const words = q.split(/\s+/).filter((w) => w.length > 1);
+  const mark = (s) => { let out = escHTML(s); for (const w of words) out = out.replace(new RegExp(`(${w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'), '<mark>$1</mark>'); return out; };
+  const hits = FAQ.filter(([qq, a]) => !words.length || words.every((w) => (qq + ' ' + a).toLowerCase().includes(w)));
+  $('#faq').innerHTML = hits.length
+    ? hits.map(([qq, a], i) => `<details${words.length && i === 0 ? ' open' : ''}><summary><span>${mark(qq)}</span></summary><div class="a">${mark(a)}</div></details>`).join('')
+    : `<div class="faq-empty">No answer for "${escHTML(q)}" yet. Ask us below, or straight on Discord.</div>`;
+  $('#faqCount').textContent = words.length ? `${hits.length} of ${FAQ.length} answers` : `${FAQ.length} answers`;
+}
+document.addEventListener('input', (e) => { if (e.target.id === 'faqQ') renderFaq(); });
+document.addEventListener('click', (e) => {
+  const j = e.target.closest('[data-scroll]'); if (!j) return;
+  e.preventDefault(); const t = document.getElementById(j.dataset.scroll);
+  if (t) { t.scrollIntoView({ behavior: REDUCE ? 'auto' : 'smooth', block: 'start' }); setTimeout(() => $('#faqQ')?.focus({ preventScroll: true }), REDUCE ? 0 : 500); }
+});
+
+/* mobile menu */
+function closeMenu() { $('#mobmenu').classList.remove('open'); }
+$('#burger').addEventListener('click', () => $('#mobmenu').classList.add('open'));
+$('#mclose').addEventListener('click', closeMenu);
+
+/* boot */
+renderBento(); renderPlans(); renderFaq(); updateCartCount(); renderCart();
+window.gsap && gsap.set('.nav', { opacity: 0 });
+if (routeName() === 'home') { go('home', true); intro(); }
+else { $('.nav').style.opacity = 1; go(routeName(), true); }
+window.addEventListener('resize', () => movePill(current));
+</script>
+</body>
+</html>
