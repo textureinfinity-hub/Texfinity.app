@@ -20,9 +20,12 @@
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; }
-  body { background: #08080a; color: #f3f3f6; font-family: "Archivo", system-ui, -apple-system, sans-serif; display: grid; place-items: center; padding: 24px; text-align: center; }
+  body { background: radial-gradient(70% 55% at 50% 100%, rgba(255,60,20,.22), transparent 70%), #08080a; color: #f3f3f6; font-family: "Archivo", system-ui, -apple-system, sans-serif; display: grid; place-items: center; padding: 24px; text-align: center; }
   img { width: 72px; height: 72px; border-radius: 16px; border: 1px solid rgba(255,255,255,.11); }
-  h1 { font-size: clamp(56px, 16vw, 120px); font-weight: 900; letter-spacing: -.03em; margin: 18px 0 4px; line-height: 1; }
+  /* Nether red: the one page that glows */
+  h1 { font-size: clamp(56px, 16vw, 120px); font-weight: 900; letter-spacing: -.03em; margin: 18px 0 4px; line-height: 1; color: #ffcf9a; text-shadow: 0 0 24px rgba(255,90,42,.85), 0 0 60px rgba(255,90,42,.4); animation: ember 2.2s ease-in-out infinite alternate; }
+  @keyframes ember { to { text-shadow: 0 0 34px rgba(255,90,42,1), 0 0 80px rgba(255,40,0,.5); } }
+  @media (prefers-reduced-motion: reduce) { h1 { animation: none; } }
   p { color: #b0b0bb; margin: 0 0 26px; font-size: 16px; }
   a { display: inline-flex; padding: 12px 22px; border-radius: 999px; background: #ececf1; color: #08080a; font-weight: 700; text-decoration: none; }
   a:hover { background: #fff; }
