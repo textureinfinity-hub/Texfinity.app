@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-lav6RQizfJuEITK3dSzVoZJsUBpoilzGkpfqPEnQz8E='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self' https://api.texfinity.app; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-8EqDu63gU+WXAt0y4ZfjxXZoTRsCbjYKFKzm7adN6Mg='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self' https://api.texfinity.app; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Texfinity: the Minecraft texture pack maker</title>
@@ -337,7 +337,7 @@ h1, h2, h3 { text-wrap: balance; margin: 0; }
 .faq .a { overflow: hidden; }
 /* #7 emerald ticks in the shop table */
 .matrix-wrap .matrix .yes svg { stroke: var(--emerald); }
-/* #8 gold Lifetime price */
+/* #8 gold Pro price */
 .matrix .mh.col-pro .price { color: var(--gold); text-shadow: 0 0 18px rgba(246,196,69,.35); }
 /* #14 the basket count is an XP orb */
 .cart-count { background: radial-gradient(circle at 35% 35%, #f6ffb0, var(--xp) 45%, #4a9a10); color: #102000; box-shadow: 0 0 12px rgba(180,255,77,.6); }
@@ -355,7 +355,7 @@ h1, h2, h3 { text-wrap: balance; margin: 0; }
 .field input[type="password"]:focus { border-color: var(--amethyst); box-shadow: 0 0 0 3px rgba(185,140,255,.22); }
 /* #44 TikTok's cyan and pink edge on the follow buttons */
 a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-shadow: -3px -2px 0 #25f4ee, 3px 2px 0 #fe2c55; border-color: rgba(255,255,255,.35); }
-/* #47 a "level up" toast when Lifetime goes in the basket */
+/* #47 a "level up" toast when Pro goes in the basket */
 .lvlup { position: fixed; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); z-index: 85; display: flex; align-items: center; gap: 12px; padding: 11px 18px 11px 12px; border-radius: 16px; background: #13210a; border: 1px solid var(--xp); color: var(--xp); font-weight: 800; font-size: 14px; box-shadow: 0 0 30px rgba(180,255,77,.25), 0 14px 40px rgba(0,0,0,.5); opacity: 0; transform: translate(-50%, 24px) scale(.96); transition: opacity .25s, transform .45s cubic-bezier(.2,1.5,.4,1); pointer-events: none; }
 .lvlup.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
 .lvlup .orb { width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #f6ffb0, var(--xp) 45%, #4a9a10); color: #102000; display: grid; place-items: center; font-size: 13px; font-weight: 900; box-shadow: 0 0 14px rgba(180,255,77,.7); }
@@ -494,7 +494,7 @@ a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-s
   .hero { padding-top: 22px; }
   .hero-badge { font-size: 10.5px; letter-spacing: .1em; }
   .hero-cta .btn { flex: 1 1 100%; }
-  /* the shop table fits the screen: no sideways scrolling to find Lifetime */
+  /* the shop table fits the screen: no sideways scrolling to find Pro */
   .matrix { min-width: 0; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr); }
   .matrix > div { padding: 11px 10px; font-size: 13px; }
   .matrix > div:not(.feat):not(.group):not(.mh) { justify-content: center; }
@@ -675,7 +675,7 @@ a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-s
   <section class="page" id="page-shop" data-page="shop">
     <div class="wrap page-pad">
       <h1 class="section-title reveal">Shop</h1>
-      <p class="lede reveal">The paint editor is free for everyone. Lifetime unlocks everything else with one payment, and keeps Texfinity being built. Delivered to your account the moment the order clears.</p>
+      <p class="lede reveal">The paint editor is free for everyone. Pro unlocks everything else with one payment, and keeps Texfinity being built. Delivered to your account the moment the order clears.</p>
       <div class="matrix-wrap reveal" id="plans"></div>
       <p class="shop-note reveal">One payment, yours for good, with every future update. Pay with Ko-fi, then open a ticket on our Discord and we unlock it.</p>
     </div>
@@ -685,7 +685,7 @@ a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-s
   <section class="page" id="page-cart" data-page="cart">
     <div class="wrap page-pad">
       <h1 class="section-title reveal">Checkout</h1>
-      <p class="lede reveal">Pay with Ko-fi, then open a ticket on our Discord: we unlock Lifetime on your email and give you the Pro role.</p>
+      <p class="lede reveal">Pay with Ko-fi, then open a ticket on our Discord: we unlock Pro on your email and give you the Pro role.</p>
       <div class="cart-grid" style="margin-top:26px">
         <div class="reveal" id="cartItems"></div>
         <div class="pay reveal" id="payPanel"></div>
@@ -775,8 +775,8 @@ a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-s
         <h2>Your account</h2>
         <p>To create an account we store your email address, a scrambled check of your password (never the password itself), your plan, and your active logins (each lasts 30 days). We email you a one-time code each time you log in, through an email delivery service that only uses your address to send it. To slow down attacks we briefly count requests per IP address and per email; these counts are kept in memory for a few minutes and never saved.</p>
 
-        <h2>Buying Lifetime</h2>
-        <p>You pay on Ko-fi, which handles the payment and your payment details under its own privacy policy; we never see your card details. You then open a ticket on our Discord with your order and Ko-fi receipt. To give you Lifetime we keep a license record: the email it's for, your Discord username and ID, a license key and the date. We keep the Pro role on your Discord account while the license is active.</p>
+        <h2>Buying Pro</h2>
+        <p>You pay on Ko-fi, which handles the payment and your payment details under its own privacy policy; we never see your card details. You then open a ticket on our Discord with your order and Ko-fi receipt. To give you Pro we keep a license record: the email it's for, your Discord username and ID, a license key and the date. We keep the Pro role on your Discord account while the license is active.</p>
 
         <h2>Why we use it (legal basis)</h2>
         <ul>
@@ -807,22 +807,22 @@ a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-s
   <section class="page" id="page-terms" data-page="terms">
     <div class="wrap page-pad legal">
       <h1 class="section-title reveal">Terms of use</h1>
-      <p class="lede reveal">Last updated 15 November 2026. The rules for using Texfinity and buying Lifetime.</p>
+      <p class="lede reveal">Last updated 15 November 2026. The rules for using Texfinity and buying Pro.</p>
       <div class="legal-body reveal">
         <h2>Who we are</h2>
-        <p>Texfinity is made by Efou and Potter, based in Bulgaria. Contact us on our Discord: <a href="https://discord.gg/texfinity" target="_blank" rel="noopener">discord.gg/texfinity</a>. By downloading Texfinity, creating an account or buying Lifetime you agree to these terms.</p>
+        <p>Texfinity is made by Efou and Potter, based in Bulgaria. Contact us on our Discord: <a href="https://discord.gg/texfinity" target="_blank" rel="noopener">discord.gg/texfinity</a>. By downloading Texfinity, creating an account or buying Pro you agree to these terms.</p>
 
-        <h2>The free app and Lifetime</h2>
+        <h2>The free app and Pro</h2>
         <ul>
           <li>The free version lets you make and export packs and use the paint editor.</li>
-          <li><b>Lifetime</b> is a one-time payment that unlocks the paid features listed on the Shop page, plus future updates, for as long as we offer Texfinity.</li>
-          <li>Lifetime belongs to one person and one Texfinity account (the email it's issued to). You may not share, resell or transfer it.</li>
-          <li>Lifetime needs the app to check your plan with our server now and then; it keeps working offline for up to 14 days, and you log in again every 30 days.</li>
+          <li><b>Pro</b> is a one-time payment that unlocks the paid features listed on the Shop page, plus future updates, for as long as we offer Texfinity.</li>
+          <li>Pro belongs to one person and one Texfinity account (the email it's issued to). You may not share, resell or transfer it.</li>
+          <li>Pro needs the app to check your plan with our server now and then; it keeps working offline for up to 14 days, and you log in again every 30 days.</li>
         </ul>
 
         <h2>Payment and no refunds</h2>
         <p><b>All purchases are final. We do not offer refunds.</b></p>
-        <p>Payment is made on Ko-fi. Lifetime is digital content delivered as soon as we unlock it on your account. Before paying, you expressly agree that delivery starts straight away and acknowledge that you lose your right to withdraw from the purchase (the 14-day right in the EU) once Lifetime is unlocked. If a payment is reversed or charged back, the license is removed.</p>
+        <p>Payment is made on Ko-fi. Pro is digital content delivered as soon as we unlock it on your account. Before paying, you expressly agree that delivery starts straight away and acknowledge that you lose your right to withdraw from the purchase (the 14-day right in the EU) once Pro is unlocked. If a payment is reversed or charged back, the license is removed.</p>
 
         <h2>Using Texfinity fairly</h2>
         <ul>
@@ -884,7 +884,7 @@ a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-s
               <div><span>Plan</span><b id="aPlan"></b></div>
               <div><span>Log in again on</span><b id="aUntil"></b></div>
             </div>
-            <a class="btn btn-ghost" id="aShop" href="#shop" data-link style="width:100%;margin-bottom:10px">See Lifetime</a>
+            <a class="btn btn-ghost" id="aShop" href="#shop" data-link style="width:100%;margin-bottom:10px">See Pro</a>
             <button class="btn btn-ghost" id="aOut" type="button">Log out</button>
           </div>
         </div>
@@ -1154,7 +1154,7 @@ function acctRender() {
   if (!AUTH_API) return acctShow('acctOff');
   if (!acct.email) return acctShow('acctForm');
   $('#aMe').textContent = acct.email;
-  $('#aPlan').textContent = acct.plan === 'pro' ? 'Lifetime' : 'Free';
+  $('#aPlan').textContent = acct.plan === 'pro' ? 'Pro' : 'Free';
   $('#aUntil').textContent = acct.expires ? new Date(acct.expires).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
   $('#aShop').hidden = acct.plan === 'pro';
   acctShow('acctIn');
@@ -1215,28 +1215,28 @@ let toastT; function toast(msg) { const t = $('#toast'); t.textContent = msg; t.
 
 /* ===== data ===== */
 const FEATURES = [
-  { k:'paint', name:'Paint editor', img:'feat-fx.jpg', pos:'50% 40%', tag:'Free · effects with Lifetime', d:'A pixel editor built for packs: a pro tool rail with one brush size, live effects you drag into place, change-color that keeps the shading, and per-layer adjustments.',
+  { k:'paint', name:'Paint editor', img:'feat-fx.jpg', pos:'50% 40%', tag:'Free · effects with Pro', d:'A pixel editor built for packs: a pro tool rail with one brush size, live effects you drag into place, change-color that keeps the shading, and per-layer adjustments.',
     long:'The heart of Texfinity: a pixel editor made for Minecraft textures. Paint with layers and masks, recolour without losing the shading, drop in any of 130 animated effects, and watch the item or block update in 3D as you go.',
-    more:['Layers with masks, opacity and colour adjustments', '130 effects with a live preview (Lifetime)', 'Animated textures, with the .mcmeta written for you', 'Unsaved work comes back if the app closes'] },
-  { k:'model', name:'3D model editor', img:'feat-model.jpg', pos:'30% 45%', tag:'Lifetime', d:'Build custom item and block models, grow and paint cubes straight on the model, and start from any vanilla model.',
+    more:['Layers with masks, opacity and colour adjustments', '130 effects with a live preview (Pro)', 'Animated textures, with the .mcmeta written for you', 'Unsaved work comes back if the app closes'] },
+  { k:'model', name:'3D model editor', img:'feat-model.jpg', pos:'30% 45%', tag:'Pro', d:'Build custom item and block models, grow and paint cubes straight on the model, and start from any vanilla model.',
     long:'Turn flat items into real 3D models. Start from the item as it is in the game, shape it cube by cube, and paint straight onto the model. Texfinity saves it where Minecraft looks for it, so it works without mods.',
     more:['Start from the game’s item or one empty cube', 'Flat items become cubes, one per row of pixels', 'Paint straight onto the model', 'Works in plain Minecraft, no mods'] },
-  { k:'sky', name:'Skybox generator', img:'feat-sky.jpg', pos:'55% 20%', tag:'Lifetime', d:'Over 100 animated skies, a mix-and-match builder, custom clouds, and fantasy and space sets.',
+  { k:'sky', name:'Skybox generator', img:'feat-sky.jpg', pos:'55% 20%', tag:'Pro', d:'Over 100 animated skies, a mix-and-match builder, custom clouds, and fantasy and space sets.',
     long:'Make a custom sky in a few clicks. Pick from over 100 animated skies, mix in stars, auroras, nebulas and planets, or use your own picture or video clip, and look around it in a live 3D preview.',
     more:['Over 100 animated skies to start from', 'Stars, auroras, nebulas, clouds and planets', 'Your own picture or video as the sky', 'OptiFine, or Skyboxify and Animatica on Fabric'] },
-  { k:'plugins', name:'Plugins', img:'feat-plugins.jpg', pos:'50% 85%', tag:'Lifetime', d:'Python add-ons that bring new tools, buttons and paint effects. Install one from a file.',
+  { k:'plugins', name:'Plugins', img:'feat-plugins.jpg', pos:'50% 85%', tag:'Pro', d:'Python add-ons that bring new tools, buttons and paint effects. Install one from a file.',
     long:'Add your own tools to Texfinity. Plugins are small Python programs that add buttons, pack-wide tools and new paint effects, and you install one from a single file.',
     more:['New buttons, pack tools and paint effects', 'Install from a .zip or .py file', 'Anyone can write one in Python', 'Only install plugins from people you trust'] },
-  { k:'upscale', name:'Upscale', img:'feat-upscale.jpg', pos:'50% 45%', tag:'Lifetime', d:'Take a 16x texture to any resolution, pixel for pixel, so it looks the same with room for finer detail.',
+  { k:'upscale', name:'Upscale', img:'feat-upscale.jpg', pos:'50% 45%', tag:'Pro', d:'Take a 16x texture to any resolution, pixel for pixel, so it looks the same with room for finer detail.',
     long:'Take a 16x pack to 32x, 64x or higher in one go. Every pixel becomes a crisp block of pixels, so the pack looks exactly the same in game, with room to add finer detail.',
     more:['2x, 4x, 8x, 16x or 32x', 'Every pixel kept crisp', 'Keep the original as a copy if you like', 'One texture or the whole pack'] },
-  { k:'showcase', name:'Showcase', img:'feat-showcase.jpg', pos:'60% 30%', tag:'Lifetime', d:'Line your packs up side by side on a board and export it as a PNG, a GIF or a video to share.',
+  { k:'showcase', name:'Showcase', img:'feat-showcase.jpg', pos:'60% 30%', tag:'Pro', d:'Line your packs up side by side on a board and export it as a PNG, a GIF or a video to share.',
     long:'Show off your packs side by side. Line them up on a board, swap any cell for a different texture, and save it as a PNG, a GIF or a video ready for TikTok or Discord.',
     more:['Several packs on one board', 'Swap any cell for another texture', 'PNG, GIF or video', 'Drop in .zip packs or whole folders'] },
   { k:'themes', name:'Themes', img:'feat-themes.jpg', pos:'50% 15%', tag:'Make it yours', d:'Recolor the whole app, set a picture, GIF or looping video as the background, and tune every animation.',
     long:'Make Texfinity look the way you like. Pick a theme and an accent colour, set a picture, GIF or looping video as the background, and choose how windows and text animate.',
     more:['Dark, Darker, Midnight, Warm, Light or your own', 'Picture, GIF or video backgrounds with glass blur', 'Choose how windows and text animate', 'Presets: Default, Calm, Showy, Performance'] },
-  { k:'sound', name:'Sound editor', img:'feat-sound.jpg', pos:'40% 20%', tag:'Lifetime', d:'Trim, mix and add effects to your pack’s sounds, record from a mic, and play them the way the game would.',
+  { k:'sound', name:'Sound editor', img:'feat-sound.jpg', pos:'40% 20%', tag:'Pro', d:'Trim, mix and add effects to your pack’s sounds, record from a mic, and play them the way the game would.',
     long:'Edit your pack’s sounds without leaving the app. Arrange clips on tracks, add effects like echo, cave or 8-bit, record from your microphone, and hear them the way Minecraft plays them.',
     more:['Tracks and clips on a timeline', 'Echo, cave, 8-bit, underwater, radio and more', 'Record from your microphone', 'Play like in game, with random pitch'] },
 ];
@@ -1247,7 +1247,7 @@ const FICON = {
   themes:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18 4.5 4.5 0 0 0 0-9 4.5 4.5 0 0 1 0-9z"/>', sound:'<path d="M4 10v4h4l5 4V6l-5 4H4z"/><path d="M17 8a5 5 0 0 1 0 8"/>',
 };
 const PLANS = [
-  { id:'lifetime', name:'LIFETIME', tier:'ONE PAYMENT', price:24.99, unit:'once', popular:false },
+  { id:'pro', name:'PRO', tier:'ONE PAYMENT', price:20, unit:'once', popular:false },
 ];
 
 /* features: the big card is a stage. Clicking another feature swaps the two: their text fades,
@@ -1350,10 +1350,10 @@ document.addEventListener('keydown', (e) => { const c = e.target.closest && e.ta
 
 /* shop + cart */
 let cart = []; try { cart = JSON.parse(localStorage.getItem('tf_cart') || '[]'); } catch {}
-cart = Array.isArray(cart) ? cart.filter((c) => PLANS.some((p) => p.id === c.id)) : []; // plans that no longer exist drop out
+cart = Array.isArray(cart) ? cart.filter((c) => PLANS.some((p) => p.id === c.id)).map((c) => { const p = PLANS.find((q) => q.id === c.id); return { id: p.id, name: p.name, price: p.price, unit: p.unit }; }) : []; // plans that no longer exist drop out; prices are always today's
 function saveCart() { try { localStorage.setItem('tf_cart', JSON.stringify(cart)); } catch {} }
 function renderPlans() {
-  // Free vs Lifetime: the free app is the paint editor and making packs; Lifetime unlocks the rest.
+  // Free vs Pro: the free app is the paint editor and making packs; Pro unlocks the rest.
   const box = $('#plans');
   const yes = '<span class="yes" aria-label="Included"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg></span>';
   const no = '<span class="no" aria-label="Not included">–</span>';
@@ -1361,7 +1361,7 @@ function renderPlans() {
     ['g', 'FREE FOR EVERYONE'],
     ['Make and export packs', 'Any Minecraft Java version, saved as a .zip', 1, 1],
     ['Paint editor', 'Layers, masks, colours, animation frames', 1, 1],
-    ['g', 'LIFETIME UNLOCKS'],
+    ['g', 'PRO UNLOCKS'],
     ['Paint effects', '130 animated effects with a live preview', 0, 1],
     ['Block details', 'Random variants for any block', 0, 1],
     ['Totem pop colours', '', 0, 1],
@@ -1379,21 +1379,21 @@ function renderPlans() {
   ];
   const head = (pl) => {
     const inCart = cart.some((c) => c.id === pl.id);
-    return `<div class="mh col-pro"><span class="tier">${pl.tier}</span><h3>${pl.name}</h3><div class="price">£${pl.price.toFixed(2)} <span>${pl.unit}</span></div><button class="btn btn-primary" data-add="${pl.id}">${inCart ? 'In cart' : 'Add to cart'}</button></div>`;
+    return `<div class="mh col-pro"><span class="tier">${pl.tier}</span><h3>${pl.name}</h3><div class="price">${money(pl.price)} <span>${pl.unit}</span></div><button class="btn btn-primary" data-add="${pl.id}">${inCart ? 'In cart' : 'Add to cart'}</button></div>`;
   };
-  let html = `<div class="mh"></div><div class="mh"><span class="tier">FREE</span><h3>FREE</h3><div class="price">£0</div><a class="btn btn-ghost" href="#download" data-link>Download</a></div>${PLANS.map(head).join('')}`;
+  let html = `<div class="mh"></div><div class="mh"><span class="tier">FREE</span><h3>FREE</h3><div class="price">€0</div><a class="btn btn-ghost" href="#download" data-link>Download</a></div>${PLANS.map(head).join('')}`;
   for (const r of ROWS) {
     if (r[0] === 'g') { html += `<div class="group">${r[1]}</div>`; continue; }
     html += `<div class="feat">${r[0]}${r[1] ? `<small>${r[1]}</small>` : ''}</div><div>${r[2] ? yes : no}</div><div class="col-pro">${r[3] ? yes : no}</div>`;
   }
-  box.innerHTML = `<div class="matrix" role="table" aria-label="What Free and Lifetime include">${html}</div>`;
+  box.innerHTML = `<div class="matrix" role="table" aria-label="What Free and Pro include">${html}</div>`;
 }
 function addToCart(id) {
   if (cart.some(c => c.id === id)) { location.hash = '#cart'; return; }
   const pl = PLANS.find(p => p.id === id); cart = [{ id: pl.id, name: pl.name, price: pl.price, unit: pl.unit }]; // one plan at a time
   saveCart(); updateCartCount(); renderPlans(); renderCart(); levelUp(pl.name);
 }
-// #47: adding Lifetime to the basket pops an XP-green "level up".
+// #47: adding Pro to the basket pops an XP-green "level up".
 let lvlT;
 function levelUp(name) {
   let el = $('#lvlup');
@@ -1404,32 +1404,32 @@ function levelUp(name) {
 }
 document.addEventListener('click', (e) => { const a = e.target.closest('[data-add]'); if (a) addToCart(a.dataset.add); });
 function updateCartCount() { const c = $('#cartCount'); c.textContent = cart.length; c.classList.toggle('show', cart.length > 0); if (!REDUCE && window.gsap && cart.length) gsap.fromTo(c, { scale: 1.6 }, { scale: 1, duration: .4, ease: 'back.out(3)' }); }
-function money(n) { return '£' + n.toFixed(2); }
+function money(n) { return '€' + (Number.isInteger(n) ? n : n.toFixed(2)); }
 let checkoutStage = 'details';
 function renderCart() {
   const items = $('#cartItems'), pay = $('#payPanel');
   if (!cart.length) {
-    items.innerHTML = `<div class="empty"><b>Your cart is empty</b><p class="dim" style="margin:8px 0 18px">Get Lifetime to unlock everything.</p><a class="btn btn-ghost" href="#shop" data-link data-mag>Open the shop</a></div>`;
-    pay.innerHTML = `<h3>SUMMARY</h3><div class="subtotal"><span class="dim">Total</span><b class="mono">£0.00</b></div><button class="btn btn-primary" style="width:100%" disabled>Checkout</button>`;
+    items.innerHTML = `<div class="empty"><b>Your cart is empty</b><p class="dim" style="margin:8px 0 18px">Get Pro to unlock everything.</p><a class="btn btn-ghost" href="#shop" data-link data-mag>Open the shop</a></div>`;
+    pay.innerHTML = `<h3>SUMMARY</h3><div class="subtotal"><span class="dim">Total</span><b class="mono">€0</b></div><button class="btn btn-primary" style="width:100%" disabled>Checkout</button>`;
     return;
   }
-  items.innerHTML = cart.map(c => `<div class="cart-item"><div class="ci-crest">${crestSVG(true)}</div><div><div class="ci-name">${c.name}</div><div class="ci-sub">Texfinity Lifetime · ${c.unit.replace('/ ','').trim()}</div></div><div class="ci-price mono">${money(c.price)}</div><button class="ci-rm" data-rm="${c.id}">Remove</button></div>`).join('');
+  items.innerHTML = cart.map(c => `<div class="cart-item"><div class="ci-crest">${crestSVG(true)}</div><div><div class="ci-name">${c.name}</div><div class="ci-sub">Texfinity Pro · ${c.unit.replace('/ ','').trim()}</div></div><div class="ci-price mono">${money(c.price)}</div><button class="ci-rm" data-rm="${c.id}">Remove</button></div>`).join('');
   const total = cart.reduce((s, c) => s + c.price, 0);
   if (checkoutStage === 'paid') {
-    // After Pay with Ko-fi: what to do next (Lifetime is unlocked by hand from a Discord ticket).
+    // After Pay with Ko-fi: what to do next (Pro is unlocked by hand from a Discord ticket).
     pay.innerHTML = `<h3>NEXT STEPS</h3>
       <ol class="steps-list">
         <li><b>Finish paying on Ko-fi</b><span>In the tab that just opened. Didn't open? <button type="button" class="linkish" id="kofiAgain">Open Ko-fi again</button></span></li>
-        <li><b>Join our Discord and open a ticket</b><span>Say you bought Lifetime.</span></li>
-        <li><b>Paste your order in the ticket</b><span>It's copied for you, with the email below. Add your Ko-fi receipt and we'll unlock Lifetime on that email and give you the Pro role.</span></li>
+        <li><b>Join our Discord and open a ticket</b><span>Say you bought Pro.</span></li>
+        <li><b>Paste your order in the ticket</b><span>It's copied for you, with the email below. Add your Ko-fi receipt and we'll unlock Pro on that email and give you the Pro role.</span></li>
       </ol>
-      <div class="deliver"><span class="ava">${esc((payEmail[0] || 'T').toUpperCase())}</span><div><div class="dim" style="font-size:11px">LIFETIME FOR</div><b>${esc(payEmail)}</b></div></div>
+      <div class="deliver"><span class="ava">${esc((payEmail[0] || 'T').toUpperCase())}</span><div><div class="dim" style="font-size:11px">PRO FOR</div><b>${esc(payEmail)}</b></div></div>
       <a class="btn btn-primary" style="width:100%" href="${DISCORD_URL}" target="_blank" rel="noopener" data-mag>Join the Discord and open a ticket</a>
       <div class="acct-row"><button type="button" id="copyOrder">Copy my order again</button><button type="button" id="newOrder">Start over</button></div>`;
     return;
   }
   pay.innerHTML = `<h3>CHECKOUT</h3>
-    <div class="field"><label for="tfUser">Email for your Lifetime license</label><input id="tfUser" type="email" placeholder="you@example.com" autocomplete="email" spellcheck="false" value="${esc(payEmail)}"><div class="err" id="userErr"></div></div>
+    <div class="field"><label for="tfUser">Email for your Pro license</label><input id="tfUser" type="email" placeholder="you@example.com" autocomplete="email" spellcheck="false" value="${esc(payEmail)}"><div class="err" id="userErr"></div></div>
     <div class="subtotal" style="margin-top:4px"><span class="dim">Total</span><b class="mono">${money(total)}</b></div>
     <button class="btn btn-primary" style="width:100%" id="payBtn" data-mag>Pay with Ko-fi · ${money(total)}</button>
     <p class="pay-note">Use the email you log in to Texfinity with. You pay on Ko-fi's own page; nothing is charged on this site.</p>`;
@@ -1447,13 +1447,13 @@ document.addEventListener('input', (e) => {
   if (e.target.id === 'tfUser') { payEmail = e.target.value.trim(); $('#userErr').textContent = ''; }
   if (e.target.id === 'cMsg' || e.target.id === 'cName') $('#cErr').textContent = '';
 });
-// Payments: Ko-fi for the money, then a Discord ticket where Lifetime is unlocked with the bot.
+// Payments: Ko-fi for the money, then a Discord ticket where Pro is unlocked with the bot.
 const KOFI_URL = 'https://ko-fi.com/texfinity';
 const DISCORD_URL = 'https://discord.gg/texfinity';
 let payEmail = '';
 function orderText() {
   const total = cart.reduce((n, c) => n + c.price, 0);
-  return `Texfinity Lifetime order\nEmail for the license: ${payEmail}\nItems: ${cart.map((c) => c.name).join(', ')}\nTotal: ${money(total)}\nPaid with Ko-fi (receipt attached)`;
+  return `Texfinity Pro order\nEmail for the license: ${payEmail}\nItems: ${cart.map((c) => c.name).join(', ')}\nTotal: ${money(total)}\nPaid with Ko-fi (receipt attached)`;
 }
 function copyOrder() { try { navigator.clipboard?.writeText(orderText()); } catch {} }
 function handlePay() {
@@ -1470,13 +1470,13 @@ function showKofiSteps() {
   wrap.innerHTML = `<div class="kofi-box" role="dialog" aria-modal="true" aria-labelledby="kofiTitle">
       <h2 id="kofiTitle">How paying works</h2>
       <ol class="steps-list">
-        <li><b>Pay on Ko-fi</b><span>Ko-fi opens in a new tab. Pay for Lifetime there; nothing is charged on this site.</span></li>
+        <li><b>Pay on Ko-fi</b><span>Ko-fi opens in a new tab. Pay for Pro there; nothing is charged on this site.</span></li>
         <li><b>Join our Discord</b><span>Use the button that appears in your basket, or discord.gg/texfinity.</span></li>
-        <li><b>Open a ticket</b><span>Say you bought Lifetime.</span></li>
+        <li><b>Open a ticket</b><span>Say you bought Pro.</span></li>
         <li><b>Paste your order and your Ko-fi receipt</b><span>Your order is copied for you when you press Understood. It includes your email: <b class="kofi-email"></b></span></li>
-        <li><b>We unlock Lifetime</b><span>On that email, plus the Pro role on Discord. Log in to Texfinity with the same email.</span></li>
+        <li><b>We unlock Pro</b><span>On that email, plus the Pro role on Discord. Log in to Texfinity with the same email.</span></li>
       </ol>
-      <label class="kofi-agree"><input type="checkbox" id="kofiAgree"><span>I agree to the <a href="#terms" data-link>Terms</a>. I want Lifetime delivered as soon as it's unlocked and understand that I then lose my right to withdraw: <b>all sales are final, no refunds.</b></span></label>
+      <label class="kofi-agree"><input type="checkbox" id="kofiAgree"><span>I agree to the <a href="#terms" data-link>Terms</a>. I want Pro delivered as soon as it's unlocked and understand that I then lose my right to withdraw: <b>all sales are final, no refunds.</b></span></label>
       <div class="kofi-actions"><button type="button" class="btn btn-ghost" id="kofiCancel">Cancel</button><button type="button" class="btn btn-primary" id="kofiOk" disabled>Understood</button></div>
     </div>`;
   wrap.querySelector('.kofi-email').textContent = payEmail;
@@ -1526,7 +1526,7 @@ async function copyContact() {
 
 /* contact: answers you can search */
 const FAQ = [
-  ['Is Texfinity free?', 'The paint editor is free, and so is making and exporting packs. Lifetime, one payment, unlocks everything else: paint effects, block details, totem pop colours, the sound editor, the 3D model editor, the skybox generator, plugins, Upscale, Showcase, Bedrock import and export, and linked folders.'],
+  ['Is Texfinity free?', 'The paint editor is free, and so is making and exporting packs. Pro, one payment, unlocks everything else: paint effects, block details, totem pop colours, the sound editor, the 3D model editor, the skybox generator, plugins, Upscale, Showcase, Bedrock import and export, and linked folders.'],
   ['Which Minecraft versions does it make packs for?', 'Minecraft Java Edition, from 1.6 up to the latest releases. You pick the version when you make a pack, and you can change it later.'],
   ['Why does Windows warn me when I open it?', 'Texfinity is new and not signed with a paid certificate yet, so SmartScreen may stop it the first time. Click "More info", then "Run anyway". The Download page shows the two screens.'],
   ['How do I know my download is the real Texfinity?', 'Only download it from texfinity.app or our Discord. The Download page shows the SHA-256 checksum of the current version: in PowerShell, run Get-FileHash on the file and check it matches exactly. If it does not, delete it and tell us.'],
@@ -1534,8 +1534,8 @@ const FAQ = [
   ['Where are my packs saved?', 'In Texfinity’s own folder on your PC. Click Folders on the home screen to open it. Packs you link from another folder stay where they are.'],
   ['How do I get my pack into Minecraft?', 'Click Export. The first time you pick your resourcepacks folder; after that, Export saves the .zip straight there and replaces the old one. Test in game reloads Minecraft’s packs for you (F3+T).'],
   ['Do I need OptiFine?', 'Most things work in plain Minecraft. Custom skies, textures that change by height and some block details need OptiFine, or on Fabric: Skyboxify and Animatica for skies, Continuity for the rest.'],
-  ['How do I get Lifetime after paying?', 'Put Lifetime in your basket and press Pay with Ko-fi. After paying, join our Discord and open a ticket: paste your order (it is copied for you) and your Ko-fi receipt, and we unlock Lifetime on your email and give you the Pro role.'],
-  ['Can I get a refund?', 'No. All purchases are final: Lifetime is delivered as soon as it is unlocked, and you agree to that before paying. See the Terms page.'],
+  ['How do I get Pro after paying?', 'Put Pro in your basket and press Pay with Ko-fi. After paying, join our Discord and open a ticket: paste your order (it is copied for you) and your Ko-fi receipt, and we unlock Pro on your email and give you the Pro role.'],
+  ['Can I get a refund?', 'No. All purchases are final: Pro is delivered as soon as it is unlocked, and you agree to that before paying. See the Terms page.'],
   ['Are plugins safe?', 'Plugins are Python programs, so they can do anything a program on your PC can. Only install plugins from people you trust.'],
   ['I found a bug. What should I send?', 'In the app, open Settings › Help and copy the bug report. Paste it in our Discord and say what you were doing. It includes the version and the recent errors, so we can fix it faster.'],
 ];
