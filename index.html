@@ -768,7 +768,7 @@ a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-s
   <section class="page" id="page-privacy" data-page="privacy" data-nosnippet>
     <div class="wrap page-pad legal">
       <h1 class="section-title reveal">Privacy policy</h1>
-      <p class="lede reveal">Last updated 15 November 2026. What Texfinity collects, why, and what you can ask us to do with it. In short: very little, nothing is sold, and your packs never leave your PC.</p>
+      <p class="lede reveal">Last updated 21 November 2026. What Texfinity collects, why, and what you can ask us to do with it. In short: very little, nothing is sold, and your packs never leave your PC.</p>
       <div class="legal-body reveal">
         <h2>Who we are</h2>
         <p>Texfinity is made by Efou and Potter, based in Bulgaria. We are the controller of the personal data described here. Contact us about anything on this page on our Discord: <a href="https://discord.gg/texfinity" target="_blank" rel="noopener">discord.gg/texfinity</a> (open a ticket and say it's a privacy request).</p>
@@ -777,6 +777,7 @@ a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-s
         <ul>
           <li><b>Your packs stay on your PC.</b> Textures, sounds, models and settings are saved in Texfinity's folder on your computer. We never receive them.</li>
           <li><b>No tracking.</b> The app has no analytics, ads or telemetry. Crash notes (crash-log.txt) stay on your PC unless you choose to send us a bug report.</li>
+          <li><b>Bug reports and pack posts</b> are only sent when you press send. A bug report sends what you type, your Discord username, the app version and your OS (plus your account email if you are logged in). A pack post sends the pack's name, description, details and pack picture, never the pack files. Our bot posts them in our Discord server.</li>
           <li><b>When you have an account,</b> the app talks to our account server to log you in and check your plan (see below).</li>
           <li><b>Discord status</b> (optional, off by default) is shared through the Discord app on your PC, under Discord's own privacy policy.</li>
           <li><b>Plugins</b> you install are made by other people and can contact their own websites. We don't control what they do.</li>
@@ -784,7 +785,7 @@ a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-s
 
         <h2>This website</h2>
         <ul>
-          <li>No analytics, no advertising and no tracking cookies. Fonts and files are served from this site itself.</li>
+          <li>No analytics, no advertising and no tracking cookies. Fonts and files are served from this site itself, except the animation library (GSAP), which loads from cdnjs, run by Cloudflare. Your browser asks cdnjs for it, so cdnjs sees your IP address and browser details, as with any site you load a file from.</li>
           <li>Your basket is kept in your own browser (local storage) and is never sent to us.</li>
           <li>If you log in here, one strictly necessary cookie keeps you logged in for up to 30 days. It can't be read by the page's scripts and is not used for anything else, so no cookie banner is needed.</li>
           <li>The site is hosted by GitHub Pages, which records basic technical logs (like IP addresses) to run and protect its service, under GitHub's privacy statement.</li>
@@ -806,8 +807,20 @@ a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-s
         <h2>How long we keep it</h2>
         <p>Login codes last 10 minutes. Your account is kept until you ask us to delete it. License and purchase records are kept for as long as the license exists and for as long as accounting law requires afterwards.</p>
 
-        <h2>Who else sees it</h2>
-        <p>Only the services that make this work: our server host, the email delivery service, Ko-fi (payments), Discord (tickets and roles) and GitHub (this website). We never sell or share your data for advertising.</p>
+        <h2>Who we share it with</h2>
+        <p>Only the services that make Texfinity work, each getting only what it needs. We never sell your data or share it for advertising.</p>
+        <ul>
+          <li><b>Railway</b> hosts our account server and Discord bot, so it stores the account, license and login data described above, plus the server's technical logs (like IP addresses).</li>
+          <li><b>Resend</b> delivers our emails: it gets your email address and the message (your login or password-reset code).</li>
+          <li><b>Ko-fi</b> takes your payment. After you pay, it tells our server the payer's email, name, amount, currency and a transaction ID, so we can unlock Pro.</li>
+          <li><b>Discord</b> runs our server, tickets and roles. It sees your Discord username and ID, what you write in tickets, and the bug reports and pack posts you send from the app.</li>
+          <li><b>GitHub</b> hosts this website (GitHub Pages) and keeps basic technical logs like IP addresses.</li>
+          <li><b>Cloudflare</b> runs our domain's DNS and cdnjs, which serves the website's animation library. It sees your IP address when your browser looks up our domain or loads that file.</li>
+        </ul>
+        <p>Some of these services are based outside the EU, mostly in the USA. Where data goes there, they protect it with the safeguards the GDPR requires, such as Standard Contractual Clauses.</p>
+
+        <h2>Built with AI</h2>
+        <p>We built Texfinity (the app, this website and our Discord bot) with the help of AI tools, mainly Anthropic's Claude, to write and check code and text. No AI is built into Texfinity: your data, your account and your packs are never sent to or processed by an AI service.</p>
 
         <h2>Your rights</h2>
         <p>You can ask to see the data we have about you, correct it, delete it, receive a copy, or object to how we use it. Ask on our Discord and we'll answer within one month. You can also complain to the Bulgarian Commission for Personal Data Protection (<a href="https://www.cpdp.bg" target="_blank" rel="noopener">cpdp.bg</a>) or the data protection authority where you live.</p>
