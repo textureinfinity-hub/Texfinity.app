@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-fTlVnu4jdTgWBrxIapDp/zt+d679avwwnX9xuMbpUO8=' 'sha256-QNHBt/8Twiegum5DEOmd3bE5Hexkk4CSGw89Lil3L0k='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self' https://api.texfinity.app; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-fTlVnu4jdTgWBrxIapDp/zt+d679avwwnX9xuMbpUO8=' 'sha256-421AFQeKHDYvJzu/Ya+t/DyaaOC5Pc3op4SHVOr+Hzo='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self' https://api.texfinity.app; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Texfinity: the Minecraft texture pack maker</title>
@@ -768,7 +768,7 @@ a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-s
   <section class="page" id="page-privacy" data-page="privacy" data-nosnippet>
     <div class="wrap page-pad legal">
       <h1 class="section-title reveal">Privacy policy</h1>
-      <p class="lede reveal">Last updated 21 November 2026. What Texfinity collects, why, and what you can ask us to do with it. In short: very little, nothing is sold, and your packs never leave your PC.</p>
+      <p class="lede reveal">Last updated 23 November 2026. What Texfinity collects, why, and what you can ask us to do with it. In short: very little, nothing is sold, and your packs never leave your PC.</p>
       <div class="legal-body reveal">
         <h2>Who we are</h2>
         <p>Texfinity is made by Efou and Potter, based in Bulgaria. We are the controller of the personal data described here. Contact us about anything on this page on our Discord: <a href="https://discord.gg/texfinity" target="_blank" rel="noopener">discord.gg/texfinity</a> (open a ticket and say it's a privacy request).</p>
@@ -795,7 +795,7 @@ a.btn[href*="tiktok.com"]:hover, a.btn[href*="tiktok.com"]:focus-visible { box-s
         <p>To create an account we store your email address, a scrambled check of your password (never the password itself), your plan, and your active logins (each lasts 30 days). We email you a one-time code each time you log in, through an email delivery service that only uses your address to send it. To slow down attacks we briefly count requests per IP address and per email; these counts are kept in memory for a few minutes and never saved.</p>
 
         <h2>Buying Pro</h2>
-        <p>You pay on Ko-fi, which handles the payment and your payment details under its own privacy policy; we never see your card details. When you pay, Ko-fi sends us your email, the amount, the currency and the payment's ID, so we can unlock Pro automatically and email you your license key. To give you Pro we keep a license record: the email it's for, a license key, the Ko-fi payment ID and the date. If you open a ticket on our Discord for the Pro role, we also store your Discord username and ID, and keep the role on your account while the license is active.</p>
+        <p>You pay on Ko-fi, which handles the payment and your payment details under its own privacy policy; we never see your card details. When you pay, Ko-fi sends us your email, the amount, the currency and the payment's ID, so we can unlock Pro automatically and email you your license key. To give you Pro we keep a license record: the email it's for, a license key, the Ko-fi payment ID and the date. At checkout you also give your Discord username, and we save it with your email before Ko-fi opens. Once you've paid, our bot gives that member the Pro role. We then store your Discord username and ID with the license, so the role stays while the license is active. If anything goes wrong, you can also get the role from a ticket on our Discord.</p>
 
         <h2>Why we use it (legal basis)</h2>
         <ul>
@@ -1454,17 +1454,18 @@ function renderCart() {
         <li><b>Check your email</b><span>Within a minute you get "Your Texfinity Pro is active" with your license key.</span></li>
         <li><b>Open Texfinity</b><span>Log in (or sign up) with the email below. Pro unlocks by itself, no restart needed.</span></li>
       </ol>
-      <div class="deliver"><span class="ava">${esc((payEmail[0] || 'T').toUpperCase())}</span><div><div class="dim" style="font-size:11px">PRO FOR</div><b>${esc(payEmail)}</b></div></div>
-      <p class="pay-note">No email after 10 minutes, or paid with a different email? Open a ticket on our Discord with your Ko-fi receipt and we'll sort it out. That's also where you get the Pro role.</p>
+      <div class="deliver"><span class="ava">${esc((payEmail[0] || 'T').toUpperCase())}</span><div><div class="dim" style="font-size:11px">PRO FOR</div><b>${esc(payEmail)}</b>${discordSaved ? `<div class="dim" style="font-size:12px">Discord role: @${esc(payDiscord)}</div>` : ''}</div></div>
+      <p class="pay-note">${discordSaved ? `The Pro role goes to @${esc(payDiscord)} once your payment arrives. Not in our Discord yet? Join and you get it within 10 minutes. ` : ''}No email after 10 minutes, or paid with a different email? Open a ticket on our Discord with your Ko-fi receipt and we'll sort it out.${discordSaved ? '' : " That's also where you get the Pro role."}</p>
       <a class="btn btn-ghost" style="width:100%" href="${DISCORD_URL}" target="_blank" rel="noopener" data-mag>Need help? Open a Discord ticket</a>
       <div class="acct-row"><button type="button" id="copyOrder">Copy my order</button><button type="button" id="newOrder">Start over</button></div>`;
     return;
   }
   pay.innerHTML = `<h3>CHECKOUT</h3>
     <div class="field"><label for="tfUser">Email for your Pro license</label><input id="tfUser" type="email" placeholder="you@example.com" autocomplete="email" spellcheck="false" value="${esc(payEmail)}"><div class="err" id="userErr"></div></div>
+    <div class="field"><label for="tfDiscord">Discord username <span class="dim">(for the Pro role)</span></label><input id="tfDiscord" placeholder="efou_" autocomplete="off" spellcheck="false" maxlength="33" value="${esc(payDiscord)}"><div class="err" id="discErr"></div></div>
     <div class="subtotal" style="margin-top:4px"><span class="dim">Total</span><b class="mono">${money(total)}</b></div>
     <button class="btn btn-primary" style="width:100%" id="payBtn" type="button">Pay with Ko-fi</button>
-    <p class="pay-note">Use the email you log in to Texfinity with, and enter the same email on Ko-fi. Pro unlocks automatically.</p>`;
+    <p class="pay-note">Use the email you log in to Texfinity with, and enter the same email on Ko-fi. Pro unlocks automatically, and our bot gives your Discord account the Pro role.</p>`;
 }
 document.addEventListener('click', (e) => {
   const rm = e.target.closest('[data-rm]');
@@ -1477,20 +1478,39 @@ document.addEventListener('click', (e) => {
 });
 document.addEventListener('input', (e) => {
   if (e.target.id === 'tfUser') { payEmail = e.target.value.trim(); $('#userErr').textContent = ''; }
+  if (e.target.id === 'tfDiscord') { payDiscord = e.target.value.trim().replace(/^@/, '').toLowerCase(); $('#discErr').textContent = ''; }
   if (e.target.id === 'cMsg' || e.target.id === 'cName') $('#cErr').textContent = '';
 });
 // Payments: Ko-fi for the money; Ko-fi tells our server, which unlocks Pro on the email automatically.
 const KOFI_URL = 'https://ko-fi.com/texfinity';
 const DISCORD_URL = 'https://discord.gg/texfinity';
 let payEmail = '';
+let payDiscord = ''; // the bot gives this Discord username the Pro role after paying
+let discordSaved = false; // the server has it (POST /pro-discord), so the role comes automatically
+// The account server, which also hands out Pro after a Ko-fi payment.
+const PRO_API = ['localhost', '127.0.0.1'].includes(location.hostname) ? 'http://localhost:8787' : 'https://api.texfinity.app';
+const DISCORD_NAME = /^(?!.*\.\.)[a-z0-9_.]{2,32}$/;
 function orderText() {
   const total = cart.reduce((n, c) => n + c.price, 0);
-  return `Texfinity Pro order\nEmail for the license: ${payEmail}\nItems: ${cart.map((c) => c.name).join(', ')}\nTotal: ${money(total)}\nPaid with Ko-fi (receipt attached)`;
+  return `Texfinity Pro order\nEmail for the license: ${payEmail}${payDiscord ? `\nDiscord: @${payDiscord}` : ''}\nItems: ${cart.map((c) => c.name).join(', ')}\nTotal: ${money(total)}\nPaid with Ko-fi (receipt attached)`;
 }
 function copyOrder() { try { navigator.clipboard?.writeText(orderText()); } catch {} }
-function handlePay() {
+async function handlePay() {
   payEmail = $('#tfUser').value.trim();
+  payDiscord = $('#tfDiscord').value.trim().replace(/^@/, '').toLowerCase();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(payEmail)) { $('#userErr').textContent = 'Enter the email you use (or will use) to log in to Texfinity.'; return; }
+  if (!payDiscord) { $('#discErr').textContent = 'Enter your Discord username so our bot can give you the Pro role.'; return; }
+  if (!DISCORD_NAME.test(payDiscord)) { $('#discErr').textContent = 'Use your Discord username (under your name in Discord, like efou_), not your display name.'; return; }
+  // Save the Discord username with the email before Ko-fi opens.
+  const btn = $('#payBtn'); btn.disabled = true;
+  discordSaved = false;
+  try {
+    const r = await fetch(PRO_API + '/pro-discord', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: payEmail, discord: payDiscord }) });
+    const d = await r.json().catch(() => ({}));
+    if (r.status === 400 && d.error) { $('#discErr').textContent = d.error; btn.disabled = false; return; }
+    discordSaved = r.ok && !!payDiscord;
+  } catch { /* server unreachable: paying still works, the role then comes from a ticket */ }
+  btn.disabled = false;
   showKofiSteps();
 }
 // Before Ko-fi opens: every step in one popup, so nobody pays and then wonders what's next.
@@ -1505,12 +1525,15 @@ function showKofiSteps() {
         <li><b>Pay on Ko-fi</b><span>Ko-fi opens in a new tab. Send <b class="kofi-total"></b> or more; nothing is charged on this site.</span></li>
         <li><b>Use this email on Ko-fi</b><span><b class="kofi-email"></b>. Pro is unlocked for the email Ko-fi receives, so it has to match your Texfinity login.</span></li>
         <li><b>Pro unlocks automatically</b><span>Within a minute: you get an email with your license key, and Texfinity unlocks when you're logged in with that email.</span></li>
-        <li><b>Want the Pro role on Discord?</b><span>Open a ticket on discord.gg/texfinity. It's also where to go if anything goes wrong.</span></li>
+        <li><b>The Pro role on Discord</b><span class="kofi-role"></span></li>
       </ol>
       <label class="kofi-agree"><input type="checkbox" id="kofiAgree"><span>I agree to the <a href="#terms" data-link>Terms</a>. I want Pro delivered as soon as it's unlocked and understand that I then lose my right to withdraw: <b>all sales are final, no refunds.</b></span></label>
       <div class="kofi-actions"><button type="button" class="btn btn-ghost" id="kofiCancel">Cancel</button><button type="button" class="btn btn-primary" id="kofiOk" disabled>Understood</button></div>
     </div>`;
   wrap.querySelector('.kofi-email').textContent = payEmail;
+  wrap.querySelector('.kofi-role').textContent = discordSaved
+    ? `Our bot gives it to @${payDiscord} automatically. Not in discord.gg/texfinity yet? Join any time in the next 30 days and you get it within 10 minutes.`
+    : "Open a ticket on discord.gg/texfinity. It's also where to go if anything goes wrong.";
   wrap.querySelector('.kofi-total').textContent = money(cart.reduce((n, c) => n + c.price, 0));
   document.body.appendChild(wrap);
   document.documentElement.style.overflow = 'hidden';
